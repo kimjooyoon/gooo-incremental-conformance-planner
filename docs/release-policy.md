@@ -15,3 +15,9 @@ The workflow uses the standard `github.token`. It does not require a shared
 ledger, another repository, or an external cross-project gate. Failed runs
 remain `OPERATIONAL_REFUTED` and are retained as evidence. A tag, release, or
 asset is never overwritten, deleted, or recreated by this policy.
+
+If a verification step fails after the tag and draft release exist, a later
+workflow run may recover them only when it finds exactly one matching draft,
+verifies the annotated tag target, and verifies the downloaded asset digest.
+Recovery preserves the existing tag and asset; it does not rebuild or replace
+the released evidence.
