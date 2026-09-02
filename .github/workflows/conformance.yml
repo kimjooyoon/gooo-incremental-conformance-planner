@@ -61,7 +61,7 @@ jobs:
       - name: Measure build and test
         shell: bash
         env:
-          GOOO_ACTION_CACHE_HIT: ${{ steps.go-cache.outputs.cache-hit }}
+          GOOO_ACTION_CACHE_HIT: ${{ steps.go-cache.outputs.cache-hit || 'false' }}
         run: bash scripts/ci-measure.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/measure"
 
       - name: Vet
