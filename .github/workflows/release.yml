@@ -135,13 +135,17 @@ jobs:
           assets_json=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100")
           asset_count=$(printf '%s' "$assets_json" | jq 'length')
           if [[ "$asset_count" == 0 ]]; then
+            upload_url=$(printf '%s' "$release_json" | jq -r '.upload_url')
+            test -n "$upload_url" && test "$upload_url" != "null"
+            upload_url="${upload_url%%\{*}"
             upload_json=$(curl --fail --silent --show-error --location \
+              --request POST \
               --header "Authorization: Bearer $GH_TOKEN" \
               --header 'Accept: application/vnd.github+json' \
-              --header 'Content-Type: application/gzip' \
+              --header 'Content-Type: application/octet-stream' \
               --header 'X-GitHub-Api-Version: 2026-03-10' \
               --data-binary "@$asset" \
-              "https://uploads.github.com/repos/$GITHUB_REPOSITORY/releases/$release_id/assets?name=$asset_name")
+              "$upload_url?name=$asset_name")
             jq -e --arg name "$asset_name" '.name == $name and .state == "uploaded"' <<<"$upload_json" >/dev/null
           elif [[ "$asset_count" != 1 ]]; then
             echo "refusing to mutate release $RELEASE_TAG with $asset_count existing assets" >&2
