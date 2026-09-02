@@ -11,7 +11,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      RELEASE_TAG: v0.1.1
+      RELEASE_TAG: v0.1.2
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -91,20 +91,8 @@ jobs:
           # shellcheck disable=SC2016
           set -Eeuo pipefail
           if git ls-remote --exit-code --refs origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
-            tag_ref=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG")
-            tag_object=$(printf '%s' "$tag_ref" | jq -r '.object.sha')
-            tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_object")
-            tag_target=$(printf '%s' "$tag_json" | jq -r '.object.sha')
-            jq -e '.object.type == "commit"' <<<"$tag_json" >/dev/null
-            release_id=$(jq -r '.next_release.release_id' .github/immutable-release-policy.json)
-            release_json=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id")
-            jq -e '.draft == true and (.assets | length == 1)' <<<"$release_json" >/dev/null
-            asset_name=$(printf '%s' "$release_json" | jq -r '.assets[0].name')
-            digest=$(printf '%s' "$release_json" | jq -r '(.assets[0].digest // "") as $digest | if $digest != "" then $digest else (try (.body | capture("Evidence asset digest: `(?<digest>sha256:[0-9a-f]+)`").digest) catch "") end')
-            test -n "$digest"
-            printf 'release_id=%s\nasset_name=%s\ndigest=%s\ncommit=%s\nmode=recovery\n' "$release_id" "$asset_name" "$digest" "$tag_target" > "$RUNNER_TEMP/release-asset.txt"
-            echo "preserving existing immutable tag and draft release $RELEASE_TAG"
-            exit 0
+            echo "refusing to overwrite existing tag $RELEASE_TAG" >&2
+            exit 1
           fi
           if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
             echo "refusing to overwrite existing release $RELEASE_TAG" >&2
@@ -119,8 +107,27 @@ jobs:
           asset=$(grep '^asset=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
           digest=$(grep '^digest=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
           printf '# %s\n\nEvidence asset digest: `%s`\n\nThe release is published only after draft verification.\n' "$RELEASE_TAG" "$digest" > "$RUNNER_TEMP/release-notes.md"
-          gh release create "$RELEASE_TAG" "$asset" --draft --title "Gooo incremental conformance planner $RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md" --verify-tag
-          printf 'asset_name=%s\ndigest=%s\ncommit=%s\nmode=created\n' "$(basename "$asset")" "$digest" "$GITHUB_SHA" > "$RUNNER_TEMP/release-asset.txt"
+          release_json=$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases" \
+            -f tag_name="$RELEASE_TAG" \
+            -f name="Gooo incremental conformance planner $RELEASE_TAG" \
+            -f body="$(<"$RUNNER_TEMP/release-notes.md")" \
+            -F draft=true \
+            -F prerelease=false)
+          release_id=$(printf '%s' "$release_json" | jq -r '.id')
+          test "$release_id" != "null"
+          asset_name=$(basename "$asset")
+          upload_json=$(gh api --method POST --hostname uploads.github.com \
+            --header 'Accept: application/vnd.github+json' \
+            --header 'Content-Type: application/gzip' \
+            --input "$asset" \
+            "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?name=$asset_name")
+          jq -e --arg name "$asset_name" '.name == $name and .state == "uploaded"' <<<"$upload_json" >/dev/null
+          asset_id=$(printf '%s' "$upload_json" | jq -r '.id')
+          server_digest=$(printf '%s' "$upload_json" | jq -r '.digest // empty')
+          if [[ -n "$server_digest" ]]; then
+            test "$digest" = "$server_digest"
+          fi
+          printf 'release_id=%s\nasset_id=%s\nasset_name=%s\ndigest=%s\ncommit=%s\nmode=created\n' "$release_id" "$asset_id" "$asset_name" "$digest" "$GITHUB_SHA" > "$RUNNER_TEMP/release-asset.txt"
 
       - name: Verify draft tag and asset digest
         shell: bash
@@ -140,9 +147,10 @@ jobs:
           tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_object")
           expected_commit=$(grep '^commit=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
           jq -e --arg sha "$expected_commit" '.object.sha == $sha and .object.type == "commit"' <<<"$tag_json" >/dev/null
-          asset_id=$(jq -r '.assets[0].id' "$release_json")
+          asset_id=$(grep '^asset_id=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
           asset=$(grep '^asset_name=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
           expected=$(grep '^digest=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
+          jq -e --arg name "$asset" --argjson id "$asset_id" '.assets[0].name == $name and .assets[0].id == $id' "$release_json" >/dev/null
           server_digest=$(jq -r '.assets[0].digest // empty' "$release_json")
           if [[ -n "$server_digest" ]]; then
             test "$server_digest" = "$expected"

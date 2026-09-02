@@ -32,22 +32,21 @@
       "artifact_digest": "sha256:84c4cd77970308693d5c6d75724eb300aa685ec605081d672d7eedde024b9390"
     }
   },
-  "next_release": {
+  "last_immutable_release": {
     "tag": "v0.1.1",
     "release_id": 381017969,
-    "draft_first": true,
-    "platform_immutable_required": true,
-    "annotated_tag_required": true,
-    "single_evidence_asset": true,
-    "asset_digest_required": true,
-    "tag_or_asset_mutation": "FORBIDDEN",
-    "draft_asset": {
+    "platform_immutable": true,
+    "draft": false,
+    "prerelease": false,
+    "tag_object_sha": "eb3aa21c88d7c72458b49b500cc5dd8c1059c0ba",
+    "tag_target_commit_sha": "f52b04e476a338106523567b2876959eb4c7f469",
+    "asset": {
       "id": 540727773,
       "name": "gooo-incremental-conformance-planner-v0.1.1-evidence.tar.gz",
       "size": 10817,
       "digest": "sha256:514cbeb5c1365d61b5852596afb44e86dbb3374ce54de8bd9bfde26b69a3e725"
     },
-    "initial_source_actions": {
+    "asset_source_actions": {
       "run_id": 33598565266,
       "head_sha": "f52b04e476a338106523567b2876959eb4c7f469",
       "conclusion": "failure",
@@ -55,6 +54,24 @@
       "artifact_name": "gooo-incremental-conformance-planner-main-33598565266",
       "artifact_size_bytes": 48179,
       "artifact_digest": "sha256:11be7a63c39b8532377f48eb5e91d67f575012513ebf98258de4a6bae150feb5"
+    },
+    "final_main_evidence": {
+      "run_id": 33598828193,
+      "head_sha": "0eef3071e52d5403c1a544731f072de6e21296f2",
+      "conclusion": "success",
+      "artifact_id": 9834378473,
+      "artifact_name": "gooo-incremental-conformance-planner-main-33598828193",
+      "artifact_size_bytes": 48584,
+      "artifact_digest": "sha256:dd15ac96efa858a4b954d69daf828765375325252eb62c7f37a91599c21bd6f7"
     }
+  },
+  "next_release": {
+    "tag": "v0.1.2",
+    "draft_first": true,
+    "platform_immutable_required": true,
+    "annotated_tag_required": true,
+    "single_evidence_asset": true,
+    "asset_digest_required": true,
+    "tag_or_asset_mutation": "FORBIDDEN"
   }
 }
