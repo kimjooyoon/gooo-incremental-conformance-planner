@@ -231,7 +231,7 @@ type Fixture struct {
 
 type Expected struct {
 	Decision     string            `json:"decision"`
-	UnknownClass string           `json:"unknown_class,omitempty"`
+	UnknownClass string            `json:"unknown_class,omitempty"`
 	Actions      map[string]string `json:"actions"`
 }
 
