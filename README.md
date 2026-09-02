@@ -36,6 +36,31 @@ measurements, cache observations, and build/test activity durations. Missing
 metrics remain `null` with `UNKNOWN`; no score, percentage, or estimated time
 is emitted. See [docs/protocol-v2.md](docs/protocol-v2.md).
 
+## v3 deterministic validation selection
+
+The append-only v3 contract at `contracts/denominator-v3.json` is owned by
+`.gooo/incremental-conformance-planner-v3.gooo`. It keeps the same 12 activity
+denominator and the independent proof buckets `FOUNDATION / COHERENCE /
+REGRESSION = 4 / 4 / 4` and indicator buckets `DRIVER / OUTCOME / GUARDRAIL =
+4 / 4 / 4`.
+
+Each v3 activity records exact `test_identity`, `conformance_identity`,
+`input_digest`, `toolchain_digest`, `semantic_ir_digest`, prior run identity,
+and observed `build_ms`, `test_ms`, `wall_ms`, `peak_rss_kib`, `cache_hit`, and
+`cache_miss`. The deterministic selection emits reusable evidence and the
+activities that must execute separately. Semantic impact or identity change
+selects a required run; missing provenance remains UNKNOWN; a cache observation
+never closes an activity by itself. The v3 suite also asserts that the v2
+exact-reuse behavior remains closed.
+
+Per-indicator integer deltas are emitted only for an exact matched before/after
+pair. Missing measurements or non-matching identity produce JSON `null` and
+`UNKNOWN`. V3 emits no total score, weighted score, expected time, or estimated
+saving. UNKNOWN evidence uses exactly the six fields `stage`, `step`, `reason`,
+`unknown_class`, `next_operation`, and `blocked_by`.
+See [docs/protocol-v3.md](docs/protocol-v3.md) and
+[docs/generated-artifacts-v3.json](docs/generated-artifacts-v3.json).
+
 ## Reuse boundary
 
 Reuse requires an immutable `PASS` receipt and exact equality of all six
@@ -91,6 +116,9 @@ gooo-incremental-conformance-planner conformance \
   --out "$RUNNER_TEMP/gooo-incremental-conformance-planner"
 ```
 
+The Actions workflow also runs `conformance-v3` and uploads its machine
+evidence, human report, exact inventory, and release-bound artifacts.
+
 `repository_writes=0`, `local_test_executions=0`, and
 `cross_project_required_gates=0` are recorded in planner evidence. A failed
 run is uploaded with `OPERATIONAL_REFUTED` state and is not deleted or
@@ -100,8 +128,8 @@ The release workflow runs only from `main`, after a green PR merge. The
 previous `v0.1.0` release was audited as `platform_immutable=false` and is
 preserved as an `OPERATIONAL_REFUTED_PRESERVED` lineage record. The repository
 immutable-release setting is activated once, and future release publication is
-draft-first. The preceding `v0.1.1` and `v0.1.2` releases are immutable and
-remain unchanged. The workflow now creates one annotated `v0.1.3` tag, uploads
+draft-first. The preceding `v0.1.1`, `v0.1.2`, and `v0.1.3` releases are immutable and
+remain unchanged. The workflow now creates one annotated `v0.1.4` tag, uploads
 one evidence asset, verifies the tag target and asset digest, requires the
 platform immutable flag after publication, and never deletes or recreates
 failed release state.

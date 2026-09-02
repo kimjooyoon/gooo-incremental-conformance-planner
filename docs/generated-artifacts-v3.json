@@ -1,0 +1,24 @@
+{
+  "schema": "gooo/incremental-conformance-planner/generated-artifacts/v3",
+  "append_only_from": "docs/generated-artifacts-v2.json",
+  "caller_owned_output": true,
+  "artifacts": [
+    {"path": "conformance-v3/semantic-ir.json", "kind": "semantic-ir"},
+    {"path": "conformance-v3/generated/evaluator.json", "kind": "generated-evaluator"},
+    {"path": "conformance-v3/actions-receipt.json", "kind": "normalized-actions-receipt"},
+    {"path": "conformance-v3/suite-report.json", "kind": "v3-conformance-suite-report"},
+    {"path": "conformance-v3/human-report.md", "kind": "v3-human-dossier"},
+    {"path": "conformance-v3/cases/*/report.json", "kind": "per-scenario-machine-report"},
+    {"path": "conformance-v3/cases/*/activity-vector.json", "kind": "per-activity-vector"},
+    {"path": "conformance-v3/cases/*/indicator-vector.json", "kind": "per-indicator-vector"},
+    {"path": "conformance-v3/cases/*/human-report.md", "kind": "per-scenario-human-report"},
+    {"path": "measure/actions-receipt-v3.json", "kind": "actions-observation-input"},
+    {"path": "inventory.json", "kind": "exact-source-inventory"}
+  ],
+  "repository_writes": 0,
+  "local_test_executions": 0,
+  "cross_project_required_gates": 0,
+  "unknown_fields": ["stage", "step", "reason", "unknown_class", "next_operation", "blocked_by"],
+  "missing_metric_representation": "null_plus_UNKNOWN",
+  "legacy_exact_reuse_regression": "required"
+}

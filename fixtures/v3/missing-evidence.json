@@ -1,0 +1,29 @@
+{
+  "schema": "gooo/incremental-conformance-planner/fixture/v3",
+  "case_id": "missing-evidence",
+  "description": "One exact identity is incomplete and one matched pair metric is missing; both remain UNKNOWN.",
+  "kind": "UNKNOWN",
+  "fixture_anchor": "fixture-anchor:missing-evidence:v3",
+  "semantic_change": {"before_digest": "sha256:graph-unknown-before-v3", "after_digest": "sha256:graph-unknown-after-v3", "changed_nodes": []},
+  "before": {"nodes": [{"id": "stable", "digest": "sha256:stable-v3"}], "edges": []},
+  "after": {"nodes": [{"id": "stable", "digest": "sha256:stable-v3"}], "edges": []},
+  "identity_defaults": {"test_identity": "sha256:test-v3", "conformance_identity": "sha256:conformance-v3", "scenario_identity": "sha256:scenario-missing-evidence-v3", "input_digest": "sha256:input-missing-evidence-v3", "toolchain_digest": "sha256:go1.27.0", "semantic_ir_digest": "sha256:d232f7078de434308792c63f983db711f62bc1fa2737e039aa55b129ebe53970", "source_digest": "sha256:8a758cf54dcee30e74f768fb43b25922395cfe39cb513ce2bdc327288a325a2c", "fixture_digest": "sha256:dd0f420bed12169170e83ae533801976369b4eb42f88cde05bf33c3a0e38daec", "contract_digest": "sha256:1922e58ac752525f6e51b5c780c3a3221273459df8882ea580b1bea79b8848de", "evaluator_digest": "sha256:bdb87bba988090f70e3b6481330889eb556f9b39f659e9df8e430e01aac2bff6"},
+  "prior_evidence_defaults": {"state": "PASS", "immutable": true, "identity": {"test_identity": "sha256:test-v3", "conformance_identity": "sha256:conformance-v3", "scenario_identity": "sha256:scenario-missing-evidence-v3", "input_digest": "sha256:input-missing-evidence-v3", "toolchain_digest": "sha256:go1.27.0", "semantic_ir_digest": "sha256:d232f7078de434308792c63f983db711f62bc1fa2737e039aa55b129ebe53970", "source_digest": "sha256:8a758cf54dcee30e74f768fb43b25922395cfe39cb513ce2bdc327288a325a2c", "fixture_digest": "sha256:dd0f420bed12169170e83ae533801976369b4eb42f88cde05bf33c3a0e38daec", "contract_digest": "sha256:1922e58ac752525f6e51b5c780c3a3221273459df8882ea580b1bea79b8848de", "evaluator_digest": "sha256:bdb87bba988090f70e3b6481330889eb556f9b39f659e9df8e430e01aac2bff6"}, "prior_run_identity": {"run_id": "actions-v3-missing-evidence", "commit_sha": "commit-v3-missing-evidence", "receipt_digest": "sha256:receipt-v3-missing-evidence"}, "result_digest": "sha256:result-v3-missing-evidence", "receipt_digest": "sha256:receipt-v3-missing-evidence", "content_digest": "sha256:receipt-v3-missing-evidence", "proof_source": "INDEPENDENT_CI"},
+  "observation_defaults": {"status": "SKIPPED_WITH_PROOF", "build_ms": null, "test_ms": null, "wall_ms": null, "peak_rss_kib": null, "cache_hit": true, "cache_miss": false},
+  "activities": [
+    {"activity_id": "DECLARE_CHANGE_SET", "semantic_nodes": ["stable"]},
+    {"activity_id": "PROJECT_SEMANTIC_IR", "semantic_nodes": ["stable"]},
+    {"activity_id": "VERIFY_DEPENDENCY_GRAPH", "semantic_nodes": ["stable"]},
+    {"activity_id": "VERIFY_PROOF_GRAPH", "semantic_nodes": ["stable"]},
+    {"activity_id": "BIND_SOURCE_IR_FIXTURE", "semantic_nodes": ["stable"]},
+    {"activity_id": "BIND_CONTRACT_EVALUATOR", "semantic_nodes": ["stable"]},
+    {"activity_id": "BIND_TOOLCHAIN_ACTIVITY", "semantic_nodes": ["stable"], "current_identity": {}},
+    {"activity_id": "VERIFY_PRIOR_RECEIPT", "semantic_nodes": ["stable"]},
+    {"activity_id": "APPLY_IMPACT_REUSE_RULE", "semantic_nodes": ["stable"]},
+    {"activity_id": "OBSERVE_ACTIONS_RECEIPT", "semantic_nodes": ["stable"]},
+    {"activity_id": "CLASSIFY_ACTIVITY_DOSSIER", "semantic_nodes": ["stable"]},
+    {"activity_id": "RENDER_HUMAN_DOSSIER", "semantic_nodes": ["stable"]}
+  ],
+  "indicators": {"scenario_identity": "sha256:pair-missing-evidence-v3", "before": {"build_ms": 64, "test_ms": 91, "wall_ms": 159, "peak_rss_kib": 174}, "after": {"build_ms": 65, "test_ms": 90, "wall_ms": null, "peak_rss_kib": 173}, "before_identity": {"test_identity": "sha256:test-pair-v3", "conformance_identity": "sha256:conformance-pair-v3", "scenario_identity": "sha256:pair-missing-evidence-v3", "input_digest": "sha256:input-pair-v3", "toolchain_digest": "sha256:go1.27.0", "semantic_ir_digest": "sha256:ir-pair-v3", "source_digest": "sha256:source-pair-v3", "fixture_digest": "sha256:fixture-pair-v3", "contract_digest": "sha256:contract-pair-v3", "evaluator_digest": "sha256:evaluator-pair-v3"}, "after_identity": {"test_identity": "sha256:test-pair-v3", "conformance_identity": "sha256:conformance-pair-v3", "scenario_identity": "sha256:pair-missing-evidence-v3", "input_digest": "sha256:input-pair-v3", "toolchain_digest": "sha256:go1.27.0", "semantic_ir_digest": "sha256:ir-pair-v3", "source_digest": "sha256:source-pair-v3", "fixture_digest": "sha256:fixture-pair-v3", "contract_digest": "sha256:contract-pair-v3", "evaluator_digest": "sha256:evaluator-pair-v3"}, "before_prior_run_identity": {"run_id": "actions-v3-before-missing", "commit_sha": "commit-v3-before-missing", "receipt_digest": "sha256:receipt-v3-before-missing"}, "after_prior_run_identity": {"run_id": "actions-v3-after-missing", "commit_sha": "commit-v3-after-missing", "receipt_digest": "sha256:receipt-v3-after-missing"}, "before_known": true, "after_known": true, "run_state": "PASS"},
+  "expected": {"decision": "UNKNOWN", "activities": {"DECLARE_CHANGE_SET": "REUSED_CLOSED", "PROJECT_SEMANTIC_IR": "REUSED_CLOSED", "VERIFY_DEPENDENCY_GRAPH": "REUSED_CLOSED", "VERIFY_PROOF_GRAPH": "REUSED_CLOSED", "BIND_SOURCE_IR_FIXTURE": "REUSED_CLOSED", "BIND_CONTRACT_EVALUATOR": "REUSED_CLOSED", "BIND_TOOLCHAIN_ACTIVITY": "UNKNOWN", "VERIFY_PRIOR_RECEIPT": "REUSED_CLOSED", "APPLY_IMPACT_REUSE_RULE": "REUSED_CLOSED", "OBSERVE_ACTIONS_RECEIPT": "REUSED_CLOSED", "CLASSIFY_ACTIVITY_DOSSIER": "REUSED_CLOSED", "RENDER_HUMAN_DOSSIER": "REUSED_CLOSED"}}
+}

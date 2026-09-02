@@ -15,4 +15,6 @@ cross_project_required_gates=0
 ```
 
 The actual counts and digest are produced by the PR/main Actions job and
-stored in `inventory.json` under the caller-owned evidence directory.
+stored in `inventory.json` under the caller-owned evidence directory. The
+inventory also carries a sorted `included_files` list and its
+`included_files_digest`; the root `README.md` is absent from that list.

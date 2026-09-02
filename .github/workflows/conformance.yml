@@ -76,6 +76,10 @@ jobs:
         shell: bash
         run: bash scripts/conformance-v2.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/conformance-v2" "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/measure/actions-receipt.json"
 
+      - name: Run deterministic validation selection v3 conformance
+        shell: bash
+        run: bash scripts/conformance-v3.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/conformance-v3" "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/measure/actions-receipt-v3.json"
+
       - name: Record inventory
         shell: bash
         run: bash scripts/inventory.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
@@ -87,6 +91,10 @@ jobs:
       - name: Assert incremental evidence v2
         shell: bash
         run: bash scripts/assert-v2-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
+
+      - name: Assert deterministic validation selection v3
+        shell: bash
+        run: bash scripts/assert-v3-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
 
       - name: Assemble evidence
         shell: bash
