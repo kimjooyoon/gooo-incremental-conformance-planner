@@ -125,13 +125,13 @@ func (c CacheIdentity) Equal(other CacheIdentity) bool {
 }
 
 type ValidationUnit struct {
-	ID             string        `json:"id"`
-	SourceRef      string        `json:"source_ref"`
-	Command        string        `json:"command"`
+	ID              string        `json:"id"`
+	SourceRef       string        `json:"source_ref"`
+	Command         string        `json:"command"`
 	SemanticNodes   []string      `json:"semantic_nodes"`
 	CurrentIdentity CacheIdentity `json:"current_identity"`
-	Cache          *CacheReceipt  `json:"cache,omitempty"`
-	Metrics        MetricVector   `json:"metrics"`
+	Cache           *CacheReceipt `json:"cache,omitempty"`
+	Metrics         MetricVector  `json:"metrics"`
 }
 
 type CacheReceipt struct {
@@ -162,15 +162,15 @@ type SemanticGraph struct {
 }
 
 type MetricVector struct {
-	BuildMS     *int64 `json:"build_ms"`
-	TestMS      *int64 `json:"test_ms"`
-	WallMS      *int64 `json:"wall_ms"`
-	PeakRSSKiB  *int64 `json:"peak_rss_kib"`
+	BuildMS    *int64 `json:"build_ms"`
+	TestMS     *int64 `json:"test_ms"`
+	WallMS     *int64 `json:"wall_ms"`
+	PeakRSSKiB *int64 `json:"peak_rss_kib"`
 }
 
 type MetricPair struct {
-	Before       MetricVector  `json:"before"`
-	After        MetricVector  `json:"after"`
+	Before      MetricVector  `json:"before"`
+	After       MetricVector  `json:"after"`
 	BeforeID    CacheIdentity `json:"before_identity"`
 	AfterID     CacheIdentity `json:"after_identity"`
 	BeforeKnown bool          `json:"before_known"`
@@ -184,16 +184,16 @@ type OptionalSlicerInput struct {
 }
 
 type Fixture struct {
-	Schema         string              `json:"schema"`
-	CaseID         string              `json:"case_id"`
-	Description    string              `json:"description"`
-	Kind           string              `json:"kind"`
-	Before         SemanticGraph      `json:"before"`
-	After          SemanticGraph      `json:"after"`
-	Units          []ValidationUnit   `json:"units"`
-	Indicators     MetricPair         `json:"indicators"`
+	Schema         string               `json:"schema"`
+	CaseID         string               `json:"case_id"`
+	Description    string               `json:"description"`
+	Kind           string               `json:"kind"`
+	Before         SemanticGraph        `json:"before"`
+	After          SemanticGraph        `json:"after"`
+	Units          []ValidationUnit     `json:"units"`
+	Indicators     MetricPair           `json:"indicators"`
 	OptionalSlicer *OptionalSlicerInput `json:"optional_slicer,omitempty"`
-	Expected       Expected            `json:"expected"`
+	Expected       Expected             `json:"expected"`
 }
 
 type Expected struct {
@@ -208,28 +208,28 @@ type ImpactClosure struct {
 }
 
 type UnitPlan struct {
-	UnitID       string      `json:"unit_id"`
-	Action       string      `json:"action"`
-	Planned      bool        `json:"planned"`
-	Executed     bool        `json:"executed"`
-	Reused       bool        `json:"reused"`
-	Unknown      bool        `json:"unknown"`
-	Refuted      bool        `json:"refuted"`
-	Reason       string      `json:"reason"`
-	Next         string      `json:"next_operation"`
-	Identity     CacheIdentity `json:"identity"`
-	Missing      []string    `json:"missing_identity_fields,omitempty"`
-	Mismatched   []string    `json:"mismatched_identity_fields,omitempty"`
-	PriorState   string      `json:"prior_state,omitempty"`
-	Metrics      MetricVector `json:"metrics"`
+	UnitID     string        `json:"unit_id"`
+	Action     string        `json:"action"`
+	Planned    bool          `json:"planned"`
+	Executed   bool          `json:"executed"`
+	Reused     bool          `json:"reused"`
+	Unknown    bool          `json:"unknown"`
+	Refuted    bool          `json:"refuted"`
+	Reason     string        `json:"reason"`
+	Next       string        `json:"next_operation"`
+	Identity   CacheIdentity `json:"identity"`
+	Missing    []string      `json:"missing_identity_fields,omitempty"`
+	Mismatched []string      `json:"mismatched_identity_fields,omitempty"`
+	PriorState string        `json:"prior_state,omitempty"`
+	Metrics    MetricVector  `json:"metrics"`
 }
 
 type Evidence struct {
-	Stage      string   `json:"stage"`
-	Step       string   `json:"step"`
-	Reason     string   `json:"reason"`
-	Next       string   `json:"next_operation"`
-	BlockedBy  []string `json:"blocked_by"`
+	Stage     string   `json:"stage"`
+	Step      string   `json:"step"`
+	Reason    string   `json:"reason"`
+	Next      string   `json:"next_operation"`
+	BlockedBy []string `json:"blocked_by"`
 }
 
 type IndicatorObservation struct {
@@ -245,37 +245,37 @@ type IndicatorObservation struct {
 
 type OperationalAudit struct {
 	State                     string `json:"state"`
-	RepositoryWrites         int    `json:"repository_writes"`
-	LocalTestExecutions      int    `json:"local_test_executions"`
-	CrossProjectRequiredGates int   `json:"cross_project_required_gates"`
-	FailedRunsPreserved      bool   `json:"failed_runs_preserved"`
-	FailureMutation          string `json:"failure_mutation"`
+	RepositoryWrites          int    `json:"repository_writes"`
+	LocalTestExecutions       int    `json:"local_test_executions"`
+	CrossProjectRequiredGates int    `json:"cross_project_required_gates"`
+	FailedRunsPreserved       bool   `json:"failed_runs_preserved"`
+	FailureMutation           string `json:"failure_mutation"`
 }
 
 type Report struct {
-	Schema          string                  `json:"schema"`
-	CaseID          string                  `json:"case_id"`
-	Decision        string                  `json:"decision"`
-	Precedence      []string                `json:"precedence"`
-	Impact          ImpactClosure           `json:"semantic_impact"`
-	Units           []UnitPlan              `json:"unit_vector"`
-	Indicators      []IndicatorObservation `json:"indicator_vector"`
-	Unknowns        []Evidence              `json:"unknown_evidence,omitempty"`
-	Refutations     []Evidence              `json:"refutation_evidence,omitempty"`
-	OptionalSlicer  OptionalSlicerStatus    `json:"optional_slicer"`
-	Operational     OperationalAudit        `json:"operational_audit"`
-	SourceDigest    string                  `json:"source_digest"`
-	ContractDigest  string                  `json:"contract_digest"`
-	MetaDigest      string                  `json:"meta_digest"`
+	Schema         string                 `json:"schema"`
+	CaseID         string                 `json:"case_id"`
+	Decision       string                 `json:"decision"`
+	Precedence     []string               `json:"precedence"`
+	Impact         ImpactClosure          `json:"semantic_impact"`
+	Units          []UnitPlan             `json:"unit_vector"`
+	Indicators     []IndicatorObservation `json:"indicator_vector"`
+	Unknowns       []Evidence             `json:"unknown_evidence,omitempty"`
+	Refutations    []Evidence             `json:"refutation_evidence,omitempty"`
+	OptionalSlicer OptionalSlicerStatus   `json:"optional_slicer"`
+	Operational    OperationalAudit       `json:"operational_audit"`
+	SourceDigest   string                 `json:"source_digest"`
+	ContractDigest string                 `json:"contract_digest"`
+	MetaDigest     string                 `json:"meta_digest"`
 }
 
 type OptionalSlicerStatus struct {
-	Consumed       bool   `json:"consumed"`
-	Required       bool   `json:"required"`
-	CrossProjectGate bool `json:"cross_project_gate"`
-	Release        string `json:"release,omitempty"`
-	Digest         string `json:"digest,omitempty"`
-	Reason         string `json:"reason"`
+	Consumed         bool   `json:"consumed"`
+	Required         bool   `json:"required"`
+	CrossProjectGate bool   `json:"cross_project_gate"`
+	Release          string `json:"release,omitempty"`
+	Digest           string `json:"digest,omitempty"`
+	Reason           string `json:"reason"`
 }
 
 type CaseSpec struct {
@@ -286,15 +286,15 @@ type CaseSpec struct {
 }
 
 type Denominator struct {
-	Schema              string         `json:"schema"`
-	ID                  string         `json:"id"`
-	Version             string         `json:"version"`
-	Fixed               bool           `json:"fixed"`
-	Cells               int            `json:"cells"`
-	Precedence          []string       `json:"precedence"`
-	ProofDenominator    map[string]int `json:"proof_denominator"`
+	Schema               string         `json:"schema"`
+	ID                   string         `json:"id"`
+	Version              string         `json:"version"`
+	Fixed                bool           `json:"fixed"`
+	Cells                int            `json:"cells"`
+	Precedence           []string       `json:"precedence"`
+	ProofDenominator     map[string]int `json:"proof_denominator"`
 	IndicatorDenominator map[string]int `json:"indicator_denominator"`
-	Cases               []CaseSpec     `json:"cases"`
+	Cases                []CaseSpec     `json:"cases"`
 }
 
 type CaseResult struct {
@@ -306,9 +306,9 @@ type CaseResult struct {
 }
 
 type SuiteReport struct {
-	Schema      string       `json:"schema"`
-	Decision    string       `json:"decision"`
-	Cases       []CaseResult `json:"cases"`
+	Schema      string           `json:"schema"`
+	Decision    string           `json:"decision"`
+	Cases       []CaseResult     `json:"cases"`
 	Operational OperationalAudit `json:"operational_audit"`
 }
 

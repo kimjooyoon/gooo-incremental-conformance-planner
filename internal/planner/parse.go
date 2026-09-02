@@ -13,7 +13,7 @@ func ParseMeta(path string) (Meta, error) {
 		return Meta{}, err
 	}
 	meta := Meta{
-		Schema: path,
+		Schema:     path,
 		Precedence: []string{}, Authorities: []string{}, ReuseRules: []string{},
 		Activities: []string{}, ProofCells: []Cell{}, IndicatorCells: []Cell{},
 		ForbiddenEffects: []string{}, SourcePath: path, SourceDigest: DigestBytes(data),

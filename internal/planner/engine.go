@@ -102,10 +102,10 @@ func Plan(meta Meta, fixture Fixture, contractDigest string) (Report, error) {
 		return Report{}, err
 	}
 	operational := OperationalAudit{
-		State: OperationalState(decision, plans),
+		State:            OperationalState(decision, plans),
 		RepositoryWrites: 0, LocalTestExecutions: 0, CrossProjectRequiredGates: 0,
 		FailedRunsPreserved: true,
-		FailureMutation: "PRESERVE_FAILED_OR_COUNTEREXAMPLE; NEVER_PROMOTE_TO_CLOSED",
+		FailureMutation:     "PRESERVE_FAILED_OR_COUNTEREXAMPLE; NEVER_PROMOTE_TO_CLOSED",
 	}
 	return Report{
 		Schema: "gooo/incremental-conformance-planner/report/v1",
@@ -504,7 +504,7 @@ func RunSuite(options SuiteOptions) (SuiteReport, error) {
 		}
 	}
 	suite := SuiteReport{
-		Schema: "gooo/incremental-conformance-planner/suite-report/v1",
+		Schema:   "gooo/incremental-conformance-planner/suite-report/v1",
 		Decision: decision, Cases: caseResults,
 		Operational: OperationalAudit{State: OperationalState(decision, nil), RepositoryWrites: 0, LocalTestExecutions: 0, CrossProjectRequiredGates: 0, FailedRunsPreserved: true, FailureMutation: "PRESERVE_FAILED_OR_COUNTEREXAMPLE; NEVER_PROMOTE_TO_CLOSED"},
 	}

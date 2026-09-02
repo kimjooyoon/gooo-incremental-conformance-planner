@@ -14,7 +14,7 @@ func TestFailedProofIsNotReusable(t *testing.T) {
 	unit := ValidationUnit{
 		ID: "unit", Command: "go test ./...", SemanticNodes: []string{"node"},
 		CurrentIdentity: completeIdentity("v1"),
-		Cache: &CacheReceipt{State: ProofFailed, Immutable: true, Identity: completeIdentity("v1"), ResultDigest: "result"},
+		Cache:           &CacheReceipt{State: ProofFailed, Immutable: true, Identity: completeIdentity("v1"), ResultDigest: "result"},
 	}
 	plan := planUnit(unit, ImpactClosure{}, nil)
 	if plan.Action != ActionRefuted || plan.Reused || !plan.Refuted {
