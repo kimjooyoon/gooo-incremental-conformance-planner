@@ -10,6 +10,10 @@ evidence_dir=${1:?usage: assert-evidence.sh EVIDENCE_DIR}
 suite="$evidence_dir/conformance/suite-report.json"
 measure="$evidence_dir/measure/ci-measurements.json"
 
+jq -r '[.cases[] | .actual] | group_by(.) | map({state: .[0], count: length}) | sort_by(.state)' "$suite"
+jq -r '.operational_audit' "$suite"
+jq -r '{schema,build_ms,test_ms,wall_ms,peak_rss_kib,repository_writes,local_test_executions,cross_project_required_gates}' "$measure"
+
 jq -e '
   .decision == "CLOSED" and
   (.cases | length == 12) and
