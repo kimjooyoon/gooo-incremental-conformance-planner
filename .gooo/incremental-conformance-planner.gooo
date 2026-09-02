@@ -1,0 +1,63 @@
+# The .gooo declaration is the authority for the planner's language-level model.
+schema gooo/incremental-conformance-planner/meta/v1
+program gooo-incremental-conformance-planner
+namespace gooo.incremental.conformance.planner
+precedence REFUTED > UNKNOWN > CLOSED
+
+authority ValidationUnit
+authority SemanticDependency
+authority CacheIdentity
+authority ReuseRule
+authority ExecutionPlan
+
+validation_unit unit_id source_ref command_descriptor semantic_nodes
+semantic_dependency from to relation
+cache_identity source_digest semantic_ir_digest fixture_digest contract_digest go_toolchain_digest command_descriptor_digest
+reuse_rule EXACT_IDENTITY_ONLY
+reuse_rule PASS_IMMUTABLE_ONLY
+reuse_rule FAILED_OR_COUNTEREXAMPLE_NEVER_REUSED
+execution_plan EXECUTE REUSE UNKNOWN REFUTED
+
+meta_activity parse-gooo
+meta_activity resolve-validation-units
+meta_activity bind-semantic-dependencies
+meta_activity compute-impact-closure
+meta_activity bind-cache-identity
+meta_activity inspect-proof-state
+meta_activity apply-reuse-rule
+meta_activity classify-execution-action
+meta_activity materialize-unit-vector
+meta_activity observe-matched-identity
+meta_activity preserve-operational-refutation
+meta_activity render-conformance-evidence
+
+proof_cell CLOSED exact-cache-hit
+proof_cell CLOSED semantic-impact-propagation
+proof_cell CLOSED unrelated-change
+proof_cell CLOSED exact-cache-hit-with-optional-slicer
+proof_cell UNKNOWN stale-toolchain
+proof_cell UNKNOWN missing-fixture-digest
+proof_cell UNKNOWN missing-cache-receipt
+proof_cell UNKNOWN unmatched-before-after
+proof_cell REFUTED known-failed-test
+proof_cell REFUTED known-counterexample
+proof_cell REFUTED graph-edge-contradiction
+proof_cell REFUTED non-immutable-failed-receipt
+
+indicator_cell OBSERVED build_ms
+indicator_cell OBSERVED test_ms
+indicator_cell OBSERVED wall_ms
+indicator_cell OBSERVED peak_rss_kib
+indicator_cell UNKNOWN build_ms-without-identity-pair
+indicator_cell UNKNOWN test_ms-without-identity-pair
+indicator_cell UNKNOWN wall_ms-without-identity-pair
+indicator_cell UNKNOWN peak_rss_kib-without-identity-pair
+indicator_cell REFUTED build_ms-from-failed-run
+indicator_cell REFUTED test_ms-from-failed-run
+indicator_cell REFUTED wall_ms-from-failed-run
+indicator_cell REFUTED peak_rss_kib-from-failed-run
+
+optional_input gooo-semantic-impact-slicer release=v0.1.1 digest_pinned=true required=false cross_project_gate=false copied=false
+forbidden_effect repository_writes
+forbidden_effect local_test_executions
+forbidden_effect cross_project_required_gates

@@ -1,0 +1,75 @@
+name: PR conformance
+
+on:
+  push:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Go 1.27
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.x'
+          check-latest: true
+
+      - name: Check Go formatting
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          files=$(gofmt -l .)
+          if [[ -n "$files" ]]; then
+            printf '%s\n' "$files"
+            exit 1
+          fi
+
+      - name: Check workflow syntax
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo" -w /repo rhysd/actionlint:1.7.7 -ignore SC2016
+
+      - name: Check shell syntax
+        shell: bash
+        run: bash -n scripts/*.sh
+
+      - name: Measure build and test
+        shell: bash
+        run: bash scripts/ci-measure.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/measure"
+
+      - name: Vet
+        shell: bash
+        run: go vet ./...
+
+      - name: Run fixed conformance
+        shell: bash
+        run: bash scripts/conformance.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/conformance"
+
+      - name: Record inventory
+        shell: bash
+        run: bash scripts/inventory.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
+
+      - name: Assert evidence
+        shell: bash
+        run: bash scripts/assert-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
+
+      - name: Assemble evidence
+        shell: bash
+        run: bash scripts/assemble-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
+
+      - name: Upload PR evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gooo-incremental-conformance-planner-pr-${{ github.run_id }}
+          path: ${{ runner.temp }}/gooo-incremental-conformance-planner-pr
+          if-no-files-found: warn
+          retention-days: 14

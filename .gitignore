@@ -1,0 +1,5 @@
+# Actions output is caller-owned and must never enter the repository.
+.evidence/
+conformance-output/
+generated/
+*.time
