@@ -143,45 +143,43 @@ jobs:
               printf 'release asset upload CLI exit status=%s\n' "$cli_status" >&2
               cat "$cli_log" || true
               cp "$cli_log" "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/release-upload-cli.log"
-              assets_json=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100")
-              asset_count=$(printf '%s' "$assets_json" | jq 'length')
-              if [[ "$asset_count" == 0 ]]; then
-                upload_url=$(printf '%s' "$release_json" | jq -r '.upload_url')
-                test -n "$upload_url" && test "$upload_url" != "null"
-                upload_url="${upload_url%%\{*}"
-                printf 'release asset upload fallback URL=%s asset=%s\n' "$upload_url" "$asset_name"
-                upload_body="$RUNNER_TEMP/release-upload.json"
-                if upload_status=$(curl --silent --show-error --location \
-                  --request POST \
-                  --header "Authorization: Bearer $GH_TOKEN" \
-                  --header 'Accept: application/vnd.github+json' \
-                  --header 'Content-Type: application/octet-stream' \
-                  --header 'X-GitHub-Api-Version: 2026-03-10' \
-                  --data-binary "@$asset" \
-                  --output "$upload_body" \
-                  --write-out '%{http_code}' \
-                  "$upload_url?name=$asset_name"); then
-                  :
-                else
-                  curl_status=$?
-                  printf 'release asset upload fallback curl exit status=%s\n' "$curl_status" >&2
-                  cat "$upload_body" || true
-                  exit 1
-                fi
-                printf 'release asset upload fallback HTTP status=%s\n' "$upload_status"
-                if [[ "$upload_status" != 201 ]]; then
-                  cat "$upload_body"
-                  exit 1
-                fi
-                upload_json=$(<"$upload_body")
-                jq -e --arg name "$asset_name" '.name == $name and .state == "uploaded"' <<<"$upload_json" >/dev/null
-                upload_mode=api-fallback
-              elif [[ "$asset_count" == 1 ]]; then
-                upload_mode=cli-partial
+            fi
+            assets_json=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100")
+            asset_count=$(printf '%s' "$assets_json" | jq 'length')
+            if [[ "$asset_count" == 0 ]]; then
+              upload_url=$(printf '%s' "$release_json" | jq -r '.upload_url')
+              test -n "$upload_url" && test "$upload_url" != "null"
+              upload_url="${upload_url%%\{*}"
+              printf 'release asset upload fallback URL=%s asset=%s\n' "$upload_url" "$asset_name"
+              upload_body="$RUNNER_TEMP/release-upload.json"
+              if upload_status=$(curl --silent --show-error --location \
+                --request POST \
+                --header "Authorization: Bearer $GH_TOKEN" \
+                --header 'Accept: application/vnd.github+json' \
+                --header 'Content-Type: application/octet-stream' \
+                --header 'X-GitHub-Api-Version: 2026-03-10' \
+                --data-binary "@$asset" \
+                --output "$upload_body" \
+                --write-out '%{http_code}' \
+                "$upload_url?name=$asset_name"); then
+                :
               else
-                echo "refusing to mutate release $RELEASE_TAG with $asset_count existing assets" >&2
+                curl_status=$?
+                printf 'release asset upload fallback curl exit status=%s\n' "$curl_status" >&2
+                cat "$upload_body" || true
                 exit 1
               fi
+              printf 'release asset upload fallback HTTP status=%s\n' "$upload_status"
+              if [[ "$upload_status" != 201 ]]; then
+                cat "$upload_body"
+                exit 1
+              fi
+              upload_json=$(<"$upload_body")
+              jq -e --arg name "$asset_name" '.name == $name and .state == "uploaded"' <<<"$upload_json" >/dev/null
+              upload_mode=api-fallback
+            elif [[ "$asset_count" != 1 ]]; then
+              echo "refusing to mutate release $RELEASE_TAG with $asset_count existing assets" >&2
+              exit 1
             fi
           elif [[ "$asset_count" != 1 ]]; then
             echo "refusing to mutate release $RELEASE_TAG with $asset_count existing assets" >&2
