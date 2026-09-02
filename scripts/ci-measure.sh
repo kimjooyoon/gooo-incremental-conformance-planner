@@ -66,6 +66,25 @@ operational_state=PASS
 if (( exit_code != 0 )); then
   operational_state=OPERATIONAL_REFUTED
 fi
+cache_hit=${GOOO_ACTION_CACHE_HIT:-}
+jq -n \
+  --arg run_id "${GITHUB_RUN_ID:-}" \
+  --arg cache_hit "$cache_hit" \
+  --argjson build_ms "$build_ms" \
+  --argjson test_ms "$test_ms" \
+  --argjson wall_ms "$wall_ms" \
+  --argjson peak_rss_kib "$peak_rss_kib" \
+  --argjson build_exit_code "$build_status" \
+  --argjson test_exit_code "$test_status" \
+  --arg state "$operational_state" \
+  '{schema:"gooo/incremental-conformance-planner/actions-receipt/v2", run_id:$run_id, build_ms:$build_ms, test_ms:$test_ms, wall_ms:$wall_ms, peak_rss_kib:$peak_rss_kib,
+    cache_hits:(if $cache_hit == "true" then 1 elif $cache_hit == "false" then 0 else null end),
+    cache_misses:(if $cache_hit == "true" then 0 elif $cache_hit == "false" then 1 else null end),
+    activities:[
+      {activity_id:"BUILD_REPOSITORY", status:(if $build_exit_code == 0 then "EXECUTED" else "OPERATIONAL_REFUTED" end), duration_ms:$build_ms, build_ms:$build_ms, test_ms:null, wall_ms:$build_ms, peak_rss_kib:$peak_rss_kib, cache_hit:(if $cache_hit == "true" then true elif $cache_hit == "false" then false else null end), cache_miss:(if $cache_hit == "true" then false elif $cache_hit == "false" then true else null end)},
+      {activity_id:"TEST_REPOSITORY", status:(if $test_exit_code == 0 then "EXECUTED" else "OPERATIONAL_REFUTED" end), duration_ms:$test_ms, build_ms:null, test_ms:$test_ms, wall_ms:$test_ms, peak_rss_kib:$peak_rss_kib, cache_hit:(if $cache_hit == "true" then true elif $cache_hit == "false" then false else null end), cache_miss:(if $cache_hit == "true" then false elif $cache_hit == "false" then true else null end)}
+    ], operational_state:$state, repository_writes:0, local_test_executions:0, cross_project_required_gates:0}' \
+  > "$evidence_dir/actions-receipt.json"
 
 jq -n \
   --argjson build_ms "$build_ms" \

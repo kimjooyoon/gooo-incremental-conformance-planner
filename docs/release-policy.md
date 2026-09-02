@@ -11,8 +11,8 @@ audit. Future releases use this draft-first policy:
 
 1. A PR must pass the PR workflow and be merged to `main`.
 2. The main workflow enforces the recorded repository immutable-release policy.
-3. It creates one annotated `v0.1.2` tag and a draft release. The preceding
-   `v0.1.1` release is already immutable and remains unchanged.
+3. It creates one annotated `v0.1.3` tag and a draft release. The preceding
+   `v0.1.2` release is already immutable and remains unchanged.
 4. It uploads one evidence asset and verifies the tag target and downloaded
    asset digest.
 5. It publishes only when the resulting release reports `immutable=true`.

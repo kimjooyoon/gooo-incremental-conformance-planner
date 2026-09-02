@@ -31,6 +31,15 @@ The conformance command reads the fixed contract and verifies:
 The evidence is a vector of rows and exact observations. It does not produce
 an aggregate score or percentage.
 
+## v2 evidence path
+
+The same Actions job also runs `conformance-v2`. It consumes the actual
+`measure/actions-receipt.json` and emits a semantic IR, generated evaluator,
+four scenario dossiers, and the exact activity accounting required by the
+append-only v2 contract. The scenarios cover exact reuse, semantic-impact
+required reruns, missing provenance, and forged/self-approved/affected-skip
+refutations. The v2 dossier is fail-closed with `REFUTED > UNKNOWN > CLOSED`.
+
 ## Main path
 
 The release workflow is enabled only for `main` after a green PR merge. It

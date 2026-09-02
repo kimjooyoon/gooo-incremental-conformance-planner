@@ -13,6 +13,29 @@ For each `ValidationUnit`, the planner emits one row with the action
 `build_ms`, `test_ms`, `wall_ms`, and `peak_rss_kib` values. Missing values are
 `UNKNOWN`, never zero. The report emits no aggregate score or percentage.
 
+## v2 evidence dossier
+
+The append-only v2 contract at `contracts/denominator-v2.json` extends the
+released v1 denominator without changing it. Its authoritative source is
+`.gooo/incremental-conformance-planner-v2.gooo`; Actions materializes that
+source as semantic IR, a generated evaluator artifact, per-activity vectors,
+and a human CI dossier.
+
+The v2 dossier distinguishes `REUSED_CLOSED` (exact six-digest identity plus
+complete activity provenance and an independent immutable PASS receipt) from
+`REQUIRED_RUN` (semantic impact or identity change requires current
+reverification). Missing identity/provenance is `UNKNOWN`; forged or stale
+receipts, evaluator self-approval, dependency/proof contradictions, and
+skipped impacted activities are `REFUTED`. Cache hits and misses are reported
+as observations, never as proof or a success metric.
+
+The human dossier includes the exact denominator and counts for total
+activities, required runs, reused closed, unknown, refuted, executed, and
+skipped-with-proof. Actual Actions receipts include integer build/test/wall/RSS
+measurements, cache observations, and build/test activity durations. Missing
+metrics remain `null` with `UNKNOWN`; no score, percentage, or estimated time
+is emitted. See [docs/protocol-v2.md](docs/protocol-v2.md).
+
 ## Reuse boundary
 
 Reuse requires an immutable `PASS` receipt and exact equality of all six
@@ -77,9 +100,9 @@ The release workflow runs only from `main`, after a green PR merge. The
 previous `v0.1.0` release was audited as `platform_immutable=false` and is
 preserved as an `OPERATIONAL_REFUTED_PRESERVED` lineage record. The repository
 immutable-release setting is activated once, and future release publication is
-draft-first. The preceding `v0.1.1` release is immutable and remains
-unchanged. The workflow now creates one annotated `v0.1.2` tag, uploads one
-evidence asset, verifies the tag target and asset digest, requires the
+draft-first. The preceding `v0.1.1` and `v0.1.2` releases are immutable and
+remain unchanged. The workflow now creates one annotated `v0.1.3` tag, uploads
+one evidence asset, verifies the tag target and asset digest, requires the
 platform immutable flag after publication, and never deletes or recreates
 failed release state.
 

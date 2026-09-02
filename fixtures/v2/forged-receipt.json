@@ -1,0 +1,41 @@
+{
+  "schema": "gooo/incremental-conformance-planner/fixture/v2",
+  "case_id": "forged-receipt",
+  "description": "Forged receipt provenance, evaluator self-approval, and an affected skipped test are preserved as REFUTED evidence.",
+  "kind": "REFUTED",
+  "fixture_anchor": "fixture-anchor:forged-receipt:v2",
+  "semantic_change": {"before_digest": "sha256:graph-refuted-before", "after_digest": "sha256:graph-refuted-after", "changed_nodes": ["root"]},
+  "before": {"nodes": [{"id": "root", "digest": "sha256:root-v1"}, {"id": "affected", "digest": "sha256:affected-v1"}, {"id": "leaf", "digest": "sha256:leaf-v1"}, {"id": "stable", "digest": "sha256:stable-v1"}], "edges": [{"from": "root", "to": "affected", "relation": "causal"}, {"from": "affected", "to": "leaf", "relation": "causal"}]},
+  "after": {"nodes": [{"id": "root", "digest": "sha256:root-v2"}, {"id": "affected", "digest": "sha256:affected-v1"}, {"id": "leaf", "digest": "sha256:leaf-v1"}, {"id": "stable", "digest": "sha256:stable-v1"}], "edges": [{"from": "root", "to": "affected", "relation": "causal"}, {"from": "affected", "to": "leaf", "relation": "causal"}]},
+  "identity_defaults": {
+    "digests": {"source_digest": "sha256:bf565366885e78b4260f6e75b966b99a3e053e5fe7e6374f02db9fffc30766f8", "semantic_ir_digest": "sha256:1f72abac6037846b8c7a214d49c5d6bad1c8e562cebf078ce23e619a1d2bddea", "fixture_digest": "sha256:94f2e9a2c5967a2bf066df4c9f5ab49faff904aa108d5dd5dab942fbb79ede1c", "contract_digest": "sha256:45c295e7362f454d984c5771f0261c1a53fd70fcb1453ea5edd0075659e3c356", "evaluator_digest": "sha256:985c4d1641b9ae461a392ebf288ab415d84550d5df1f31943bfba8af2417c3b9", "go_toolchain_digest": "sha256:go1.27.0"},
+    "activity": {"scenario_digest": "sha256:scenario-forged-receipt", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}
+  },
+  "receipt_defaults": {
+    "state": "PASS", "immutable": true,
+    "identity": {"digests": {"source_digest": "sha256:bf565366885e78b4260f6e75b966b99a3e053e5fe7e6374f02db9fffc30766f8", "semantic_ir_digest": "sha256:1f72abac6037846b8c7a214d49c5d6bad1c8e562cebf078ce23e619a1d2bddea", "fixture_digest": "sha256:94f2e9a2c5967a2bf066df4c9f5ab49faff904aa108d5dd5dab942fbb79ede1c", "contract_digest": "sha256:45c295e7362f454d984c5771f0261c1a53fd70fcb1453ea5edd0075659e3c356", "evaluator_digest": "sha256:985c4d1641b9ae461a392ebf288ab415d84550d5df1f31943bfba8af2417c3b9", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-forged-receipt", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}},
+    "result_digest": "sha256:result-valid-default", "receipt_digest": "sha256:receipt-valid-default", "content_digest": "sha256:receipt-valid-default", "source_run_id": "actions-forged-receipt", "source_commit": "commit-forged-receipt", "proof_source": "INDEPENDENT_CI"
+  },
+  "observation_defaults": {"status": "SKIPPED_WITH_PROOF", "duration_ms": null, "build_ms": null, "test_ms": null, "wall_ms": null, "peak_rss_kib": null, "cache_hit": true, "cache_miss": false},
+  "activities": [
+    {"activity_id": "DECLARE_CHANGE_SET", "semantic_nodes": ["stable"]},
+    {"activity_id": "PROJECT_SEMANTIC_IR", "semantic_nodes": ["stable"]},
+    {"activity_id": "VERIFY_DEPENDENCY_GRAPH", "semantic_nodes": ["stable"]},
+    {"activity_id": "VERIFY_PROOF_GRAPH", "semantic_nodes": ["stable"]},
+    {"activity_id": "BIND_SOURCE_IR_FIXTURE", "semantic_nodes": ["stable"]},
+    {"activity_id": "BIND_CONTRACT_EVALUATOR", "semantic_nodes": ["stable"], "prior_receipt": {"state": "PASS", "immutable": true, "identity": {"digests": {"source_digest": "PENDING_SOURCE_DIGEST", "semantic_ir_digest": "PENDING_IR_DIGEST", "fixture_digest": "PENDING_FIXTURE_DIGEST", "contract_digest": "PENDING_CONTRACT_DIGEST", "evaluator_digest": "PENDING_EVALUATOR_DIGEST", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-forged-receipt", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}}, "result_digest": "sha256:result-self-approval", "receipt_digest": "sha256:receipt-self-approval", "content_digest": "sha256:receipt-self-approval", "source_run_id": "actions-self-approval", "source_commit": "commit-self-approval", "proof_source": "EVALUATOR_SELF_APPROVAL"}},
+    {"activity_id": "BIND_TOOLCHAIN_ACTIVITY", "semantic_nodes": ["stable"]},
+    {"activity_id": "VERIFY_PRIOR_RECEIPT", "semantic_nodes": ["stable"], "prior_receipt": {"state": "PASS", "immutable": true, "identity": {"digests": {"source_digest": "PENDING_SOURCE_DIGEST", "semantic_ir_digest": "PENDING_IR_DIGEST", "fixture_digest": "PENDING_FIXTURE_DIGEST", "contract_digest": "PENDING_CONTRACT_DIGEST", "evaluator_digest": "PENDING_EVALUATOR_DIGEST", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-forged-receipt", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}}, "result_digest": "sha256:result-forged", "receipt_digest": "sha256:receipt-forged", "content_digest": "sha256:receipt-content", "source_run_id": "actions-forged-receipt", "source_commit": "commit-forged-receipt", "proof_source": "INDEPENDENT_CI"}},
+    {"activity_id": "APPLY_IMPACT_REUSE_RULE", "semantic_nodes": ["affected"]},
+    {"activity_id": "OBSERVE_ACTIONS_RECEIPT", "semantic_nodes": ["leaf"]},
+    {"activity_id": "CLASSIFY_ACTIVITY_DOSSIER", "semantic_nodes": ["affected"]},
+    {"activity_id": "RENDER_HUMAN_DOSSIER", "semantic_nodes": ["stable"]}
+  ],
+  "indicators": {
+    "scenario_digest": "sha256:scenario-forged-receipt", "before": {"build_ms": 55, "test_ms": 88, "wall_ms": 149, "peak_rss_kib": 164}, "after": {"build_ms": 0, "test_ms": 0, "wall_ms": 0, "peak_rss_kib": 0},
+    "before_identity": {"digests": {"source_digest": "sha256:source-pair-v2", "semantic_ir_digest": "sha256:ir-pair-v2", "fixture_digest": "sha256:fixture-pair-v2", "contract_digest": "sha256:contract-pair-v2", "evaluator_digest": "sha256:evaluator-pair-v2", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-forged-receipt", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}},
+    "after_identity": {"digests": {"source_digest": "sha256:source-pair-v2", "semantic_ir_digest": "sha256:ir-pair-v2", "fixture_digest": "sha256:fixture-pair-v2", "contract_digest": "sha256:contract-pair-v2", "evaluator_digest": "sha256:evaluator-pair-v2", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-forged-receipt", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}},
+    "before_known": true, "after_known": true, "run_state": "FAILED"
+  },
+  "expected": {"decision": "REFUTED", "activities": {"BIND_CONTRACT_EVALUATOR": "REFUTED", "VERIFY_PRIOR_RECEIPT": "REFUTED", "APPLY_IMPACT_REUSE_RULE": "REFUTED", "OBSERVE_ACTIONS_RECEIPT": "REFUTED", "CLASSIFY_ACTIVITY_DOSSIER": "REFUTED"}}
+}

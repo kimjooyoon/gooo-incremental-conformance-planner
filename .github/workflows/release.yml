@@ -11,7 +11,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      RELEASE_TAG: v0.1.2
+      RELEASE_TAG: v0.1.3
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -23,6 +23,18 @@ jobs:
         with:
           go-version: '1.27.x'
           check-latest: true
+          cache: false
+
+      - name: Restore Go caches
+        id: go-cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: gooo-incremental-conformance-planner-${{ runner.os }}-${{ hashFiles('go.mod') }}
+          restore-keys: |
+            gooo-incremental-conformance-planner-${{ runner.os }}-
 
       - name: Check Go formatting
         shell: bash
@@ -52,6 +64,8 @@ jobs:
 
       - name: Measure build and test
         shell: bash
+        env:
+          GOOO_ACTION_CACHE_HIT: ${{ steps.go-cache.outputs.cache-hit || 'false' }}
         run: bash scripts/ci-measure.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/measure"
 
       - name: Vet
@@ -62,6 +76,10 @@ jobs:
         shell: bash
         run: bash scripts/conformance.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/conformance"
 
+      - name: Run incremental evidence v2 conformance
+        shell: bash
+        run: bash scripts/conformance-v2.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/conformance-v2" "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/measure/actions-receipt.json"
+
       - name: Record inventory
         shell: bash
         run: bash scripts/inventory.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main"
@@ -69,6 +87,10 @@ jobs:
       - name: Assert evidence
         shell: bash
         run: bash scripts/assert-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main"
+
+      - name: Assert incremental evidence v2
+        shell: bash
+        run: bash scripts/assert-v2-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main"
 
       - name: Assemble evidence
         shell: bash

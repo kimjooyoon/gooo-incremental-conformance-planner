@@ -1,0 +1,31 @@
+{
+  "schema": "gooo/incremental-conformance-planner/denominator/v2",
+  "id": "incremental-conformance-planner-v2",
+  "version": "v2",
+  "append_only_from": "v1",
+  "base_contract": "contracts/denominator-v1.json",
+  "target_activities": 12,
+  "precedence": ["REFUTED", "UNKNOWN", "CLOSED"],
+  "proof_totals": {"FOUNDATION": 4, "COHERENCE": 4, "REGRESSION": 4},
+  "indicator_totals": {"DRIVER": 4, "OUTCOME": 4, "GUARDRAIL": 4},
+  "activities": [
+    {"ordinal": 1, "id": "DECLARE_CHANGE_SET", "activity": "DeclareSemanticChangeSet", "stage": "INPUT", "step": "DECLARE_SEMANTIC_CHANGE_SET", "proof_choice": "FOUNDATION", "indicator_class": "DRIVER", "depends_on": []},
+    {"ordinal": 2, "id": "PROJECT_SEMANTIC_IR", "activity": "ProjectSemanticIR", "stage": "PROJECT", "step": "PROJECT_GOOO_TO_SEMANTIC_IR", "proof_choice": "FOUNDATION", "indicator_class": "DRIVER", "depends_on": ["DECLARE_CHANGE_SET"]},
+    {"ordinal": 3, "id": "VERIFY_DEPENDENCY_GRAPH", "activity": "VerifyDependencyGraph", "stage": "GRAPH", "step": "VERIFY_DEPENDENCY_AND_PROOF_GRAPH", "proof_choice": "FOUNDATION", "indicator_class": "OUTCOME", "depends_on": ["PROJECT_SEMANTIC_IR"]},
+    {"ordinal": 4, "id": "VERIFY_PROOF_GRAPH", "activity": "VerifyProofGraph", "stage": "GRAPH", "step": "VERIFY_PROOF_GRAPH_DIGESTS", "proof_choice": "FOUNDATION", "indicator_class": "GUARDRAIL", "depends_on": ["VERIFY_DEPENDENCY_GRAPH"]},
+    {"ordinal": 5, "id": "BIND_SOURCE_IR_FIXTURE", "activity": "BindSourceIRFixtureIdentity", "stage": "BINDING", "step": "BIND_SOURCE_IR_FIXTURE_IDENTITY", "proof_choice": "COHERENCE", "indicator_class": "DRIVER", "depends_on": ["PROJECT_SEMANTIC_IR"]},
+    {"ordinal": 6, "id": "BIND_CONTRACT_EVALUATOR", "activity": "BindContractEvaluatorIdentity", "stage": "BINDING", "step": "BIND_CONTRACT_EVALUATOR_IDENTITY", "proof_choice": "COHERENCE", "indicator_class": "OUTCOME", "depends_on": ["PROJECT_SEMANTIC_IR"]},
+    {"ordinal": 7, "id": "BIND_TOOLCHAIN_ACTIVITY", "activity": "BindToolchainActivityIdentity", "stage": "BINDING", "step": "BIND_TOOLCHAIN_AND_ACTIVITY_IDENTITY", "proof_choice": "COHERENCE", "indicator_class": "GUARDRAIL", "depends_on": ["BIND_SOURCE_IR_FIXTURE"]},
+    {"ordinal": 8, "id": "VERIFY_PRIOR_RECEIPT", "activity": "VerifyPriorImmutableReceipt", "stage": "RECEIPT", "step": "VERIFY_PRIOR_IMMUTABLE_RECEIPT", "proof_choice": "COHERENCE", "indicator_class": "DRIVER", "depends_on": ["BIND_CONTRACT_EVALUATOR"]},
+    {"ordinal": 9, "id": "APPLY_IMPACT_REUSE_RULE", "activity": "ApplyImpactReuseRule", "stage": "PLAN", "step": "APPLY_IMPACT_AND_REUSE_RULE", "proof_choice": "REGRESSION", "indicator_class": "OUTCOME", "depends_on": ["VERIFY_PRIOR_RECEIPT"]},
+    {"ordinal": 10, "id": "OBSERVE_ACTIONS_RECEIPT", "activity": "ObserveActionsReceipt", "stage": "OBSERVATION", "step": "OBSERVE_ACTIONS_BUILD_TEST_RECEIPT", "proof_choice": "REGRESSION", "indicator_class": "GUARDRAIL", "depends_on": ["APPLY_IMPACT_REUSE_RULE"]},
+    {"ordinal": 11, "id": "CLASSIFY_ACTIVITY_DOSSIER", "activity": "ClassifyActivityDossier", "stage": "DOSSIER", "step": "CLASSIFY_REQUIRED_REUSE_UNKNOWN_REFUTED", "proof_choice": "REGRESSION", "indicator_class": "OUTCOME", "depends_on": ["OBSERVE_ACTIONS_RECEIPT"]},
+    {"ordinal": 12, "id": "RENDER_HUMAN_DOSSIER", "activity": "RenderHumanCIDossier", "stage": "REPORT", "step": "RENDER_MACHINE_AND_HUMAN_CI_DOSSIER", "proof_choice": "REGRESSION", "indicator_class": "GUARDRAIL", "depends_on": ["CLASSIFY_ACTIVITY_DOSSIER"]}
+  ],
+  "scenarios": [
+    {"id": "exact-reuse", "source": "fixtures/v2/exact-reuse.json", "expected": "CLOSED"},
+    {"id": "required-rerun", "source": "fixtures/v2/required-rerun.json", "expected": "CLOSED"},
+    {"id": "missing-provenance", "source": "fixtures/v2/missing-provenance.json", "expected": "UNKNOWN"},
+    {"id": "forged-receipt", "source": "fixtures/v2/forged-receipt.json", "expected": "REFUTED"}
+  ]
+}

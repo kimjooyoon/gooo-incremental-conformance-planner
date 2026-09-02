@@ -1,0 +1,23 @@
+{
+  "schema": "gooo/incremental-conformance-planner/generated-artifacts/v2",
+  "append_only_from": "docs/generated-artifacts-v1.json",
+  "caller_owned_output": true,
+  "artifacts": [
+    {"path": "conformance-v2/semantic-ir.json", "kind": "semantic-ir"},
+    {"path": "conformance-v2/generated/evaluator.json", "kind": "generated-evaluator"},
+    {"path": "measure/actions-receipt.json", "kind": "actions-build-test-receipt"},
+    {"path": "conformance-v2/suite-report.json", "kind": "v2-conformance-suite-report"},
+    {"path": "conformance-v2/human-report.md", "kind": "v2-human-dossier"},
+    {"path": "conformance-v2/actions-receipt.json", "kind": "dossier-actions-receipt-copy"},
+    {"path": "conformance-v2/cases/*/report.json", "kind": "per-scenario-machine-report"},
+    {"path": "conformance-v2/cases/*/activity-vector.json", "kind": "per-activity-vector"},
+    {"path": "conformance-v2/cases/*/indicator-vector.json", "kind": "per-indicator-vector"}
+  ],
+  "repository_writes": 0,
+  "local_test_executions": 0,
+  "cross_project_required_gates": 0,
+  "missing_metric_representation": "null_plus_UNKNOWN",
+  "aggregate_score": false,
+  "aggregate_percentage": false,
+  "estimated_savings": false
+}
