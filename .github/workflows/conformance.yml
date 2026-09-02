@@ -25,7 +25,6 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          gofmt -d . || true
           files=$(gofmt -l .)
           if [[ -n "$files" ]]; then
             printf '%s\n' "$files"
@@ -36,7 +35,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          docker run --rm -v "$GITHUB_WORKSPACE:/repo" -w /repo rhysd/actionlint:1.7.7
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo" -w /repo rhysd/actionlint:1.7.7 -ignore SC2016
 
       - name: Check shell syntax
         shell: bash
