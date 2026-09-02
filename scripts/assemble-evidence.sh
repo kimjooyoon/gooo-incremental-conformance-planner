@@ -17,5 +17,5 @@ jq -n \
   --arg sha "$commit_sha" \
   --arg ref "${GITHUB_REF}" \
   --arg toolchain "$toolchain" \
-  '{schema:"gooo/incremental-conformance-planner/evidence-manifest/v1", repository:$repository, actions_run_id:$run_id, workflow:$workflow, ref:$ref, commit_sha:$sha, go_toolchain:$toolchain, runtime:{repository_writes:0,local_test_executions:0,cross_project_required_gates:0}, failed_runs:"OPERATIONAL_REFUTED_PRESERVED", generated_artifacts:["conformance/suite-report.json","conformance/human-report.md","measure/ci-measurements.json","inventory.json","release-verification.json"]}' \
+  '{schema:"gooo/incremental-conformance-planner/evidence-manifest/v2", repository:$repository, actions_run_id:$run_id, workflow:$workflow, ref:$ref, commit_sha:$sha, go_toolchain:$toolchain, runtime:{repository_writes:0,local_test_executions:0,cross_project_required_gates:0}, failed_runs:"OPERATIONAL_REFUTED_PRESERVED", generated_artifacts:["conformance/suite-report.json","conformance/human-report.md","conformance-v2/suite-report.json","conformance-v2/human-report.md","conformance-v2/semantic-ir.json","conformance-v2/generated/evaluator.json","conformance-v2/actions-receipt.json","measure/ci-measurements.json","measure/actions-receipt.json","inventory.json","release-verification.json"]}' \
   > "$manifest"

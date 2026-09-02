@@ -1,0 +1,41 @@
+{
+  "schema": "gooo/incremental-conformance-planner/fixture/v2",
+  "case_id": "required-rerun",
+  "description": "A semantic change propagates through the proof graph; affected activities run while the unaffected branch is reused.",
+  "kind": "NORMAL",
+  "fixture_anchor": "fixture-anchor:required-rerun:v2",
+  "semantic_change": {"before_digest": "sha256:graph-rerun-before", "after_digest": "sha256:graph-rerun-after", "changed_nodes": ["root"]},
+  "before": {"nodes": [{"id": "root", "digest": "sha256:root-v1"}, {"id": "affected", "digest": "sha256:affected-v1"}, {"id": "leaf", "digest": "sha256:leaf-v1"}, {"id": "stable", "digest": "sha256:stable-v1"}], "edges": [{"from": "root", "to": "affected", "relation": "causal"}, {"from": "affected", "to": "leaf", "relation": "causal"}]},
+  "after": {"nodes": [{"id": "root", "digest": "sha256:root-v2"}, {"id": "affected", "digest": "sha256:affected-v1"}, {"id": "leaf", "digest": "sha256:leaf-v1"}, {"id": "stable", "digest": "sha256:stable-v1"}], "edges": [{"from": "root", "to": "affected", "relation": "causal"}, {"from": "affected", "to": "leaf", "relation": "causal"}]},
+  "identity_defaults": {
+    "digests": {"source_digest": "sha256:bf565366885e78b4260f6e75b966b99a3e053e5fe7e6374f02db9fffc30766f8", "semantic_ir_digest": "sha256:1f72abac6037846b8c7a214d49c5d6bad1c8e562cebf078ce23e619a1d2bddea", "fixture_digest": "sha256:0d4f773a4588f3ea540504e8c51b9a922524b4cff00073410db3f545c492a78a", "contract_digest": "sha256:45c295e7362f454d984c5771f0261c1a53fd70fcb1453ea5edd0075659e3c356", "evaluator_digest": "sha256:985c4d1641b9ae461a392ebf288ab415d84550d5df1f31943bfba8af2417c3b9", "go_toolchain_digest": "sha256:go1.27.0"},
+    "activity": {"scenario_digest": "sha256:scenario-required-rerun", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}
+  },
+  "receipt_defaults": {
+    "state": "PASS", "immutable": true,
+    "identity": {"digests": {"source_digest": "sha256:bf565366885e78b4260f6e75b966b99a3e053e5fe7e6374f02db9fffc30766f8", "semantic_ir_digest": "sha256:1f72abac6037846b8c7a214d49c5d6bad1c8e562cebf078ce23e619a1d2bddea", "fixture_digest": "sha256:0d4f773a4588f3ea540504e8c51b9a922524b4cff00073410db3f545c492a78a", "contract_digest": "sha256:45c295e7362f454d984c5771f0261c1a53fd70fcb1453ea5edd0075659e3c356", "evaluator_digest": "sha256:985c4d1641b9ae461a392ebf288ab415d84550d5df1f31943bfba8af2417c3b9", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-required-rerun", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}},
+    "result_digest": "sha256:result-required-rerun", "receipt_digest": "sha256:receipt-required-rerun", "content_digest": "sha256:receipt-required-rerun", "source_run_id": "actions-required-rerun", "source_commit": "commit-required-rerun", "proof_source": "INDEPENDENT_CI"
+  },
+  "observation_defaults": {"status": "SKIPPED_WITH_PROOF", "duration_ms": null, "build_ms": null, "test_ms": null, "wall_ms": null, "peak_rss_kib": null, "cache_hit": true, "cache_miss": false},
+  "activities": [
+    {"activity_id": "DECLARE_CHANGE_SET", "semantic_nodes": ["stable"]},
+    {"activity_id": "PROJECT_SEMANTIC_IR", "semantic_nodes": ["stable"]},
+    {"activity_id": "VERIFY_DEPENDENCY_GRAPH", "semantic_nodes": ["stable"]},
+    {"activity_id": "VERIFY_PROOF_GRAPH", "semantic_nodes": ["stable"]},
+    {"activity_id": "BIND_SOURCE_IR_FIXTURE", "semantic_nodes": ["stable"]},
+    {"activity_id": "BIND_CONTRACT_EVALUATOR", "semantic_nodes": ["stable"]},
+    {"activity_id": "BIND_TOOLCHAIN_ACTIVITY", "semantic_nodes": ["stable"]},
+    {"activity_id": "VERIFY_PRIOR_RECEIPT", "semantic_nodes": ["stable"]},
+    {"activity_id": "APPLY_IMPACT_REUSE_RULE", "semantic_nodes": ["affected"], "observation": {"status": "EXECUTED", "duration_ms": 17, "build_ms": 7, "test_ms": 8, "wall_ms": 17, "peak_rss_kib": 144, "cache_hit": false, "cache_miss": true}},
+    {"activity_id": "OBSERVE_ACTIONS_RECEIPT", "semantic_nodes": ["leaf"], "observation": {"status": "EXECUTED", "duration_ms": 23, "build_ms": 9, "test_ms": 12, "wall_ms": 23, "peak_rss_kib": 151, "cache_hit": false, "cache_miss": true}},
+    {"activity_id": "CLASSIFY_ACTIVITY_DOSSIER", "semantic_nodes": ["affected"], "observation": {"status": "EXECUTED", "duration_ms": 13, "build_ms": 5, "test_ms": 7, "wall_ms": 13, "peak_rss_kib": 139, "cache_hit": false, "cache_miss": true}},
+    {"activity_id": "RENDER_HUMAN_DOSSIER", "semantic_nodes": ["stable"]}
+  ],
+  "indicators": {
+    "scenario_digest": "sha256:scenario-required-rerun", "before": {"build_ms": 52, "test_ms": 85, "wall_ms": 142, "peak_rss_kib": 162}, "after": {"build_ms": 61, "test_ms": 93, "wall_ms": 159, "peak_rss_kib": 168},
+    "before_identity": {"digests": {"source_digest": "sha256:source-pair-v2", "semantic_ir_digest": "sha256:ir-pair-v2", "fixture_digest": "sha256:fixture-pair-v2", "contract_digest": "sha256:contract-pair-v2", "evaluator_digest": "sha256:evaluator-pair-v2", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-required-rerun", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}},
+    "after_identity": {"digests": {"source_digest": "sha256:source-pair-v2", "semantic_ir_digest": "sha256:ir-pair-v2", "fixture_digest": "sha256:fixture-pair-v2", "contract_digest": "sha256:contract-pair-v2", "evaluator_digest": "sha256:evaluator-pair-v2", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-required-rerun", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}},
+    "before_known": true, "after_known": true, "run_state": "PASS"
+  },
+  "expected": {"decision": "CLOSED", "activities": {"DECLARE_CHANGE_SET": "REUSED_CLOSED", "PROJECT_SEMANTIC_IR": "REUSED_CLOSED", "VERIFY_DEPENDENCY_GRAPH": "REUSED_CLOSED", "VERIFY_PROOF_GRAPH": "REUSED_CLOSED", "BIND_SOURCE_IR_FIXTURE": "REUSED_CLOSED", "BIND_CONTRACT_EVALUATOR": "REUSED_CLOSED", "BIND_TOOLCHAIN_ACTIVITY": "REUSED_CLOSED", "VERIFY_PRIOR_RECEIPT": "REUSED_CLOSED", "APPLY_IMPACT_REUSE_RULE": "REQUIRED_RUN", "OBSERVE_ACTIONS_RECEIPT": "REQUIRED_RUN", "CLASSIFY_ACTIVITY_DOSSIER": "REQUIRED_RUN", "RENDER_HUMAN_DOSSIER": "REUSED_CLOSED"}}
+}

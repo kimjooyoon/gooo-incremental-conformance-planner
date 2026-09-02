@@ -33,40 +33,40 @@
     }
   },
   "last_immutable_release": {
-    "tag": "v0.1.1",
-    "release_id": 381017969,
+    "tag": "v0.1.2",
+    "release_id": 381036116,
     "platform_immutable": true,
     "draft": false,
     "prerelease": false,
-    "tag_object_sha": "eb3aa21c88d7c72458b49b500cc5dd8c1059c0ba",
-    "tag_target_commit_sha": "f52b04e476a338106523567b2876959eb4c7f469",
+    "tag_object_sha": "d2f16f107819822277421ff9cd0771d7ef3ca0c6",
+    "tag_target_commit_sha": "39df38fc084f7caae318c4ba79bca478b0a86825",
     "asset": {
-      "id": 540727773,
-      "name": "gooo-incremental-conformance-planner-v0.1.1-evidence.tar.gz",
-      "size": 10817,
-      "digest": "sha256:514cbeb5c1365d61b5852596afb44e86dbb3374ce54de8bd9bfde26b69a3e725"
+      "id": 540786204,
+      "name": "gooo-incremental-conformance-planner-v0.1.2-evidence.tar.gz",
+      "size": 11587,
+      "digest": "sha256:be66a8fb529bcddcf2880751eb9812cf1b02c988a37219188e259ba3c6ce87d7"
     },
     "asset_source_actions": {
-      "run_id": 33598565266,
-      "head_sha": "f52b04e476a338106523567b2876959eb4c7f469",
-      "conclusion": "failure",
-      "artifact_id": 9834281503,
-      "artifact_name": "gooo-incremental-conformance-planner-main-33598565266",
-      "artifact_size_bytes": 48179,
-      "artifact_digest": "sha256:11be7a63c39b8532377f48eb5e91d67f575012513ebf98258de4a6bae150feb5"
+      "run_id": 33603051032,
+      "head_sha": "fbe78a13c01e016f9410620c208953c28c7fe478",
+      "conclusion": "success",
+      "artifact_id": 9835929022,
+      "artifact_name": "gooo-incremental-conformance-planner-main-33603051032",
+      "artifact_size_bytes": 51042,
+      "artifact_digest": "sha256:23c71a7dc261fdb4a22fd9cb60147632e69b618d99a616342841dbf74416635f"
     },
     "final_main_evidence": {
-      "run_id": 33598828193,
-      "head_sha": "0eef3071e52d5403c1a544731f072de6e21296f2",
+      "run_id": 33603051032,
+      "head_sha": "fbe78a13c01e016f9410620c208953c28c7fe478",
       "conclusion": "success",
-      "artifact_id": 9834378473,
-      "artifact_name": "gooo-incremental-conformance-planner-main-33598828193",
-      "artifact_size_bytes": 48584,
-      "artifact_digest": "sha256:dd15ac96efa858a4b954d69daf828765375325252eb62c7f37a91599c21bd6f7"
+      "artifact_id": 9835929022,
+      "artifact_name": "gooo-incremental-conformance-planner-main-33603051032",
+      "artifact_size_bytes": 51042,
+      "artifact_digest": "sha256:23c71a7dc261fdb4a22fd9cb60147632e69b618d99a616342841dbf74416635f"
     }
   },
   "next_release": {
-    "tag": "v0.1.2",
+    "tag": "v0.1.3",
     "draft_first": true,
     "platform_immutable_required": true,
     "annotated_tag_required": true,

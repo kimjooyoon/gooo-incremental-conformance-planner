@@ -12,15 +12,17 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fatal("usage: gooo-incremental-conformance-planner <plan|conformance> [flags]")
+		fatal("usage: gooo-incremental-conformance-planner <plan|conformance|conformance-v2> [flags]")
 	}
 	switch os.Args[1] {
 	case "plan":
 		plan(os.Args[2:])
 	case "conformance":
 		conformance(os.Args[2:])
+	case "conformance-v2":
+		conformanceV2(os.Args[2:])
 	default:
-		fatal("command must be plan or conformance")
+		fatal("command must be plan, conformance, or conformance-v2")
 	}
 }
 
@@ -73,6 +75,33 @@ func conformance(args []string) {
 		Report   string `json:"report"`
 	}{report.Decision, filepath.Join(*out, "suite-report.json")})
 	if report.Decision != planner.DecisionClosed {
+		os.Exit(1)
+	}
+}
+
+func conformanceV2(args []string) {
+	flags := flag.NewFlagSet("conformance-v2", flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	meta := flags.String("meta", ".gooo/incremental-conformance-planner-v2.gooo", "authoritative v2 .gooo source")
+	contract := flags.String("contract", "contracts/denominator-v2.json", "append-only v2 activity contract")
+	casesRoot := flags.String("cases-root", ".", "repository root containing fixture paths")
+	actionsReceipt := flags.String("actions-receipt", "", "actual GitHub Actions build/test receipt")
+	out := flags.String("out", "", "absolute caller-owned output directory")
+	if err := flags.Parse(args); err != nil {
+		os.Exit(2)
+	}
+	if *out == "" || !filepath.IsAbs(*out) {
+		fatal("--out must be an absolute caller-owned path")
+	}
+	report, err := planner.RunV2Suite(planner.V2SuiteOptions{MetaPath: *meta, ContractPath: *contract, CasesRoot: *casesRoot, OutputDir: *out, ActionsReceiptPath: *actionsReceipt})
+	if err != nil {
+		fatal(err.Error())
+	}
+	printJSON(struct {
+		Decision string `json:"decision"`
+		Report   string `json:"report"`
+	}{report.Decision, filepath.Join(*out, "suite-report.json")})
+	if report.Decision != planner.V2DecisionClosed {
 		os.Exit(1)
 	}
 }
