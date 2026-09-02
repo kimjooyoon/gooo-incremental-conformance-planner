@@ -459,4 +459,3 @@ type V3SuiteReport struct {
 	MissingActionsMetrics   []string           `json:"missing_actions_metrics,omitempty"`
 	Operational             V3Operational      `json:"operational"`
 }
-

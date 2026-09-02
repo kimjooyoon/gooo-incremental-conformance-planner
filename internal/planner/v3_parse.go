@@ -309,4 +309,3 @@ func LoadV3ActionsReceipt(path string) (V3ActionsReceipt, error) {
 	}
 	return receipt, nil
 }
-

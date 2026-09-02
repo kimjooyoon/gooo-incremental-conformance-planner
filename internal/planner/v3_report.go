@@ -44,7 +44,6 @@ func RenderV3Report(report V3Report) string {
 	fmt.Fprintf(&b, "Operational boundary: repository_writes=%d, local_test_executions=%d, cross_project_required_gates=%d, failed_runs_preserved=%t, verification_authority=%s.\n", report.Operational.RepositoryWrites, report.Operational.LocalTestExecutions, report.Operational.CrossProjectRequiredGates, report.Operational.FailedRunsPreserved, report.Operational.VerificationAuthority)
 	return b.String()
 }
-
 func RenderV3SuiteReport(report V3SuiteReport) string {
 	var b strings.Builder
 	b.WriteString("# Incremental conformance planner v3\n\n")
@@ -60,4 +59,3 @@ func RenderV3SuiteReport(report V3SuiteReport) string {
 	fmt.Fprintf(&b, "Operational boundary: repository_writes=%d, local_test_executions=%d, cross_project_required_gates=%d, failed_runs_preserved=%t, verification_authority=%s.\n", report.Operational.RepositoryWrites, report.Operational.LocalTestExecutions, report.Operational.CrossProjectRequiredGates, report.Operational.FailedRunsPreserved, report.Operational.VerificationAuthority)
 	return b.String()
 }
-
