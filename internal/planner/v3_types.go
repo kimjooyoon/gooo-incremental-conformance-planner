@@ -423,8 +423,8 @@ type V3Report struct {
 	FixtureDigest   string                   `json:"fixture_digest"`
 	EvaluatorDigest string                   `json:"evaluator_digest"`
 	ActionsReceipt  *V3ActionsReceipt        `json:"actions_receipt,omitempty"`
-	FixedPointState string                    `json:"fixed_point_state"`
-	Operational     V3Operational              `json:"operational"`
+	FixedPointState string                   `json:"fixed_point_state"`
+	Operational     V3Operational            `json:"operational"`
 }
 
 type V3Operational struct {
@@ -432,8 +432,8 @@ type V3Operational struct {
 	LocalTestExecutions       int    `json:"local_test_executions"`
 	CrossProjectRequiredGates int    `json:"cross_project_required_gates"`
 	FailedRunsPreserved       bool   `json:"failed_runs_preserved"`
-	OutputLocation        string `json:"output_location"`
-	VerificationAuthority string `json:"verification_authority"`
+	OutputLocation            string `json:"output_location"`
+	VerificationAuthority     string `json:"verification_authority"`
 }
 
 type V3CaseResult struct {
