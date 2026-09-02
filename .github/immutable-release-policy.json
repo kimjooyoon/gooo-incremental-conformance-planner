@@ -34,11 +34,27 @@
   },
   "next_release": {
     "tag": "v0.1.1",
+    "release_id": 381017969,
     "draft_first": true,
     "platform_immutable_required": true,
     "annotated_tag_required": true,
     "single_evidence_asset": true,
     "asset_digest_required": true,
-    "tag_or_asset_mutation": "FORBIDDEN"
+    "tag_or_asset_mutation": "FORBIDDEN",
+    "draft_asset": {
+      "id": 540727773,
+      "name": "gooo-incremental-conformance-planner-v0.1.1-evidence.tar.gz",
+      "size": 10817,
+      "digest": "sha256:514cbeb5c1365d61b5852596afb44e86dbb3374ce54de8bd9bfde26b69a3e725"
+    },
+    "initial_source_actions": {
+      "run_id": 33598565266,
+      "head_sha": "f52b04e476a338106523567b2876959eb4c7f469",
+      "conclusion": "failure",
+      "artifact_id": 9834281503,
+      "artifact_name": "gooo-incremental-conformance-planner-main-33598565266",
+      "artifact_size_bytes": 48179,
+      "artifact_digest": "sha256:11be7a63c39b8532377f48eb5e91d67f575012513ebf98258de4a6bae150feb5"
+    }
   }
 }

@@ -18,6 +18,7 @@ jq -e '
   and .preceding_release.platform_immutable == false
   and .preceding_release.tag == "v0.1.0"
   and .next_release.tag == "v0.1.1"
+  and (.next_release.release_id | type) == "number"
   and .next_release.draft_first == true
   and .next_release.platform_immutable_required == true
   and .next_release.annotated_tag_required == true
