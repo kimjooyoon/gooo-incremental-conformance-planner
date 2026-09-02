@@ -19,10 +19,10 @@ jq -e '
 ' "$suite" >/dev/null
 
 jq -e '
-  (.operational.repository_writes == 0) and
-  (.operational.local_test_executions == 0) and
-  (.operational.cross_project_required_gates == 0) and
-  (.operational.failed_runs_preserved == true)
+  (.operational_audit.repository_writes == 0) and
+  (.operational_audit.local_test_executions == 0) and
+  (.operational_audit.cross_project_required_gates == 0) and
+  (.operational_audit.failed_runs_preserved == true)
 ' "$suite" >/dev/null
 
 jq -e '
