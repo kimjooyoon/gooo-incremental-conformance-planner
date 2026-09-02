@@ -1,0 +1,44 @@
+{
+  "schema": "gooo/incremental-conformance-planner/immutable-release-policy/v1",
+  "active": true,
+  "activation_count": 1,
+  "repository_setting": {
+    "endpoint": "repos/kimjooyoon/gooo-incremental-conformance-planner/immutable-releases",
+    "enabled": true,
+    "enforced_by_owner": false
+  },
+  "preceding_release": {
+    "tag": "v0.1.0",
+    "release_id": 381011146,
+    "platform_immutable": false,
+    "draft": false,
+    "prerelease": false,
+    "status": "OPERATIONAL_REFUTED_PRESERVED",
+    "tag_object_sha": "62b9069a7656cf17a25769a639264d87ddb496fe",
+    "tag_target_commit_sha": "37f3ac2a9fc6821f0f2356d4b6223bbd4e6ab489",
+    "asset": {
+      "id": 540715304,
+      "name": "gooo-incremental-conformance-planner-v0.1.0-evidence.tar.gz",
+      "size": 10808,
+      "digest": "sha256:5e48e2eb56e54be19b3a0be451bd3f93ff2bd2e515aaa671c4a1460881f89b17"
+    },
+    "source_actions": {
+      "run_id": 33597546114,
+      "head_sha": "37f3ac2a9fc6821f0f2356d4b6223bbd4e6ab489",
+      "conclusion": "failure",
+      "artifact_id": 9833925232,
+      "artifact_name": "gooo-incremental-conformance-planner-main-33597546114",
+      "artifact_size_bytes": 48179,
+      "artifact_digest": "sha256:84c4cd77970308693d5c6d75724eb300aa685ec605081d672d7eedde024b9390"
+    }
+  },
+  "next_release": {
+    "tag": "v0.1.1",
+    "draft_first": true,
+    "platform_immutable_required": true,
+    "annotated_tag_required": true,
+    "single_evidence_asset": true,
+    "asset_digest_required": true,
+    "tag_or_asset_mutation": "FORBIDDEN"
+  }
+}

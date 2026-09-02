@@ -1,23 +1,25 @@
-# Release policy v1
+# Release policy v2
 
-`v0.1.0` is a draft-first, evidence-backed immutable release:
+`v0.1.0` is retained as an evidence-backed operationally refuted predecessor.
+Its GitHub release reported `immutable=false`; its release, annotated tag,
+evidence asset, and source Actions evidence are preserved as
+`OPERATIONAL_REFUTED_PRESERVED`. They are never deleted or rewritten. The
+exact lineage is recorded in `.github/immutable-release-policy.json`.
 
-1. A PR is opened and must pass the PR workflow.
-2. The green PR is merged to `main`.
-3. The main workflow repeats the checks and records Actions run identity,
-   commit digest, Go toolchain identity, exact measurement values, and artifact
-   digests.
-4. The workflow creates one annotated `v0.1.0` tag and verifies its target.
-5. It creates a draft release, uploads the single evidence tarball, verifies
-   the server asset digest, and publishes the draft.
+The repository immutable-release setting is activated exactly once after that
+audit. Future releases use this draft-first policy:
 
-The workflow uses the standard `github.token`. It does not require a shared
-ledger, another repository, or an external cross-project gate. Failed runs
-remain `OPERATIONAL_REFUTED` and are retained as evidence. A tag, release, or
-asset is never overwritten, deleted, or recreated by this policy.
+1. A PR must pass the PR workflow and be merged to `main`.
+2. The main workflow verifies the repository immutable-release setting.
+3. It creates one annotated `v0.1.1` tag and a draft release.
+4. It uploads one evidence asset and verifies the tag target and downloaded
+   asset digest.
+5. It publishes only when the resulting release reports `immutable=true`.
 
-If a verification step fails after the tag and draft release exist, a later
-workflow run may recover them only when it finds exactly one matching draft,
-verifies the annotated tag target, and verifies the downloaded asset digest.
-Recovery preserves the existing tag and asset; it does not rebuild or replace
-the released evidence.
+The workflow records Actions run identity, commit digest, Go toolchain identity,
+exact measurement values, and artifact digests. A failed run remains retained
+as operational evidence. A tag, release, or asset is never overwritten,
+deleted, or recreated by this policy.
+
+The technical basis remains limited to official Go documentation:
+[Go 1.27 Release Notes](https://go.dev/doc/go1.27), [About the go command](https://go.dev/doc/articles/go_command), and [Go Modules Reference](https://go.dev/ref/mod).

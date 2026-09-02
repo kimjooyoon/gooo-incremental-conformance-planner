@@ -10,7 +10,8 @@
     {"path": "suite-report.json", "kind": "conformance-suite-report"},
     {"path": "inventory.json", "kind": "repository-inventory"},
     {"path": "ci-measurements.json", "kind": "actions-measurement"},
-    {"path": "evidence-manifest.json", "kind": "release-evidence-manifest"}
+    {"path": "evidence-manifest.json", "kind": "release-evidence-manifest"},
+    {"path": "release-verification.json", "kind": "immutable-release-verification"}
   ],
   "digest": "sha256:computed-in-actions",
   "no_repository_write": true

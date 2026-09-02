@@ -68,10 +68,13 @@ gooo-incremental-conformance-planner conformance \
 run is uploaded with `OPERATIONAL_REFUTED` state and is not deleted or
 rewritten.
 
-The release workflow runs only from `main`, after a green PR merge. It creates
-one annotated `v0.1.0` tag, creates the release as a draft, uploads one evidence
-asset, verifies the tag target and asset digest, and then publishes it. It
-fails if the tag or release already exists; it never deletes or recreates
+The release workflow runs only from `main`, after a green PR merge. The
+previous `v0.1.0` release was audited as `platform_immutable=false` and is
+preserved as an `OPERATIONAL_REFUTED_PRESERVED` lineage record. The repository
+immutable-release setting is activated once, and future release publication is
+draft-first. The workflow now creates one annotated `v0.1.1` tag, uploads one
+evidence asset, verifies the tag target and asset digest, requires the
+platform immutable flag after publication, and never deletes or recreates
 failed release state.
 
 ## Technical basis
