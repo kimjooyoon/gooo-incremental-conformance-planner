@@ -138,6 +138,7 @@ jobs:
             upload_url=$(printf '%s' "$release_json" | jq -r '.upload_url')
             test -n "$upload_url" && test "$upload_url" != "null"
             upload_url="${upload_url%%\{*}"
+            printf 'release asset upload URL=%s asset=%s\n' "$upload_url" "$asset_name"
             upload_body="$RUNNER_TEMP/release-upload.json"
             if upload_status=$(curl --silent --show-error --location \
               --request POST \
@@ -151,9 +152,12 @@ jobs:
               "$upload_url?name=$asset_name"); then
               :
             else
+              curl_status=$?
+              printf 'release asset upload curl exit status=%s\n' "$curl_status" >&2
               cat "$upload_body" || true
               exit 1
             fi
+            printf 'release asset upload HTTP status=%s\n' "$upload_status"
             if [[ "$upload_status" != 201 ]]; then
               cat "$upload_body"
               exit 1
