@@ -283,7 +283,11 @@ func LoadV3Fixture(path string) (V3Fixture, error) {
 	if fixture.Kind != "NORMAL" && fixture.Kind != V3DecisionUnknown && fixture.Kind != V3DecisionRefuted {
 		return V3Fixture{}, fmt.Errorf("fixture %s has invalid kind %q", path, fixture.Kind)
 	}
-	if fixture.Expected.Decision != fixture.Kind {
+	expectedKind := fixture.Kind
+	if fixture.Kind == "NORMAL" {
+		expectedKind = V3DecisionClosed
+	}
+	if fixture.Expected.Decision != expectedKind {
 		return V3Fixture{}, fmt.Errorf("fixture %s expected decision must match kind", path)
 	}
 	seen := map[string]bool{}
