@@ -25,6 +25,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
+          gofmt -d . || true
           files=$(gofmt -l .)
           if [[ -n "$files" ]]; then
             printf '%s\n' "$files"
