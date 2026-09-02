@@ -70,7 +70,7 @@ func ParseV3Source(path string) (V3Source, string, error) {
 				return V3Source{}, "", fmt.Errorf("line %d: fixed_point_case requires id and mode", lineNumber)
 			}
 			source.FixedPointCases = append(source.FixedPointCases, fields[1]+"="+fields[2])
-		case "semantic_change_set", "proof_graph", "activity_identity", "prior_run_identity", "observation", "semantic_ir", "evaluator", "selection_policy":
+		case "semantic_change_set", "proof_graph", "test_identity", "conformance_identity", "input_digest", "activity_identity", "prior_run_identity", "observation", "semantic_ir_digest", "semantic_ir", "evaluator", "selection_policy":
 			// These declarations name authority-owned structures and policies.
 		case "activity":
 			if len(fields) < 9 {
