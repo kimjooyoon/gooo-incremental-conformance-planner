@@ -98,6 +98,39 @@ jq -n \
   '{schema:"gooo/incremental-conformance-planner/ci-measurements/v1", build_ms:$build_ms, test_ms:$test_ms, wall_ms:$wall_ms, peak_rss_kib:$peak_rss_kib, build_exit_code:$build_exit_code, test_exit_code:$test_exit_code, exit_code:$exit_code, operational_state:$state, repository_writes:0, local_test_executions:0, cross_project_required_gates:0}' \
   > "$evidence_dir/ci-measurements.json"
 
+test_identity=$(printf '%s' 'go test ./...' | sha256sum | cut -d' ' -f1)
+conformance_identity=$(printf '%s' 'gooo-incremental-conformance-planner conformance-v3 --meta .gooo/incremental-conformance-planner-v3.gooo --contract contracts/denominator-v3.json --cases-root . --actions-receipt measure/actions-receipt-v3.json' | sha256sum | cut -d' ' -f1)
+input_digest=$(printf '%s' "${GITHUB_SHA:-}" | sha256sum | cut -d' ' -f1)
+receipt_digest=$(printf '%s|%s|%s|%s|%s' "${GITHUB_RUN_ID:-}" "${GITHUB_SHA:-}" "$build_ms" "$test_ms" "$wall_ms" | sha256sum | cut -d' ' -f1)
+jq -n \
+  --arg run_id "${GITHUB_RUN_ID:-}" \
+  --arg commit_sha "${GITHUB_SHA:-}" \
+  --arg receipt_digest "sha256:$receipt_digest" \
+  --arg test_identity "sha256:$test_identity" \
+  --arg conformance_identity "sha256:$conformance_identity" \
+  --arg input_digest "sha256:$input_digest" \
+  --arg toolchain_digest "sha256:go1.27.0" \
+  --arg semantic_ir_digest "" \
+  --arg cache_hit "$cache_hit" \
+  --argjson build_ms "$build_ms" \
+  --argjson test_ms "$test_ms" \
+  --argjson wall_ms "$wall_ms" \
+  --argjson peak_rss_kib "$peak_rss_kib" \
+  --argjson build_exit_code "$build_status" \
+  --argjson test_exit_code "$test_status" \
+  --arg state "$operational_state" \
+  '{schema:"gooo/incremental-conformance-planner/actions-receipt/v3", run_identity:{run_id:$run_id,commit_sha:$commit_sha,receipt_digest:$receipt_digest}, test_identity:$test_identity, conformance_identity:$conformance_identity, input_digest:$input_digest, toolchain_digest:$toolchain_digest, semantic_ir_digest:$semantic_ir_digest,
+    build_ms:$build_ms, test_ms:$test_ms, wall_ms:$wall_ms, peak_rss_kib:$peak_rss_kib,
+    cache_hit:(if $cache_hit == "true" then true elif $cache_hit == "false" then false else null end),
+    cache_miss:(if $cache_hit == "true" then false elif $cache_hit == "false" then true else null end),
+    cache_hits:(if $cache_hit == "true" then 1 elif $cache_hit == "false" then 0 else null end),
+    cache_misses:(if $cache_hit == "true" then 0 elif $cache_hit == "false" then 1 else null end),
+    activities:[
+      {activity_id:"BUILD_REPOSITORY", status:(if $build_exit_code == 0 then "EXECUTED" else "OPERATIONAL_REFUTED" end), duration_ms:$build_ms, build_ms:$build_ms, test_ms:null, wall_ms:$build_ms, peak_rss_kib:$peak_rss_kib, cache_hit:(if $cache_hit == "true" then true elif $cache_hit == "false" then false else null end), cache_miss:(if $cache_hit == "true" then false elif $cache_hit == "false" then true else null end)},
+      {activity_id:"TEST_REPOSITORY", status:(if $test_exit_code == 0 then "EXECUTED" else "OPERATIONAL_REFUTED" end), duration_ms:$test_ms, build_ms:null, test_ms:$test_ms, wall_ms:$test_ms, peak_rss_kib:$peak_rss_kib, cache_hit:(if $cache_hit == "true" then true elif $cache_hit == "false" then false else null end), cache_miss:(if $cache_hit == "true" then false elif $cache_hit == "false" then true else null end)}
+    ], operational_state:$state, repository_writes:0, local_test_executions:0, cross_project_required_gates:0}' \
+  > "$evidence_dir/actions-receipt-v3.json"
+
 if (( exit_code != 0 )); then
   exit 1
 fi

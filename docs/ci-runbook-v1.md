@@ -47,3 +47,14 @@ repeats the conformance and measurement path, creates an evidence manifest,
 and calculates the asset SHA-256 digest. A pre-existing `v0.1.0` tag or release
 causes a hard failure. No failed tag, release, or asset is deleted or
 recreated.
+
+## v3 selection path
+
+The PR and main workflows also run the v3 deterministic selection contract.
+The v3 machine dossier records exact test/conformance/input/toolchain/semantic
+IR identities, prior run identity, the six Actions observations, per-activity
+reuse or required-run selection, and the six-field UNKNOWN frontier. The
+normal, UNKNOWN, and REFUTED cases are retained in the uploaded artifact. The
+v3 assertions require the released exact-reuse behavior to remain closed and
+require per-indicator deltas to be null unless an exact matched pair is
+present.

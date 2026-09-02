@@ -11,8 +11,8 @@ audit. Future releases use this draft-first policy:
 
 1. A PR must pass the PR workflow and be merged to `main`.
 2. The main workflow enforces the recorded repository immutable-release policy.
-3. It creates one annotated `v0.1.3` tag and a draft release. The preceding
-   `v0.1.2` release is already immutable and remains unchanged.
+3. It creates one annotated `v0.1.4` tag and a draft release. The preceding
+   `v0.1.3` release is already immutable and remains unchanged.
 4. It uploads one evidence asset and verifies the tag target and downloaded
    asset digest.
 5. It publishes only when the resulting release reports `immutable=true`.
@@ -24,7 +24,8 @@ records both the preserved tag target and the Actions run/head that produced
 the final evidence.
 
 The workflow records Actions run identity, commit digest, Go toolchain identity,
-exact measurement values, and artifact digests. A failed run remains retained
+exact measurement values, and artifact digests. The v3 deterministic selection
+dossier and exact inventory are included in the single evidence asset. A failed run remains retained
 as operational evidence. A tag, release, or asset is never overwritten,
 deleted, or recreated by this policy.
 
