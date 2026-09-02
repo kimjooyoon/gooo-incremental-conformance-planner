@@ -11,8 +11,6 @@ permissions:
 jobs:
   conformance:
     runs-on: ubuntu-latest
-    env:
-      EVIDENCE_DIR: ${{ runner.temp }}/gooo-incremental-conformance-planner-pr
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,7 +43,7 @@ jobs:
 
       - name: Measure build and test
         shell: bash
-        run: bash scripts/ci-measure.sh "$EVIDENCE_DIR/measure"
+        run: bash scripts/ci-measure.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/measure"
 
       - name: Vet
         shell: bash
@@ -53,25 +51,25 @@ jobs:
 
       - name: Run fixed conformance
         shell: bash
-        run: bash scripts/conformance.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$EVIDENCE_DIR/conformance"
+        run: bash scripts/conformance.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/conformance"
 
       - name: Record inventory
         shell: bash
-        run: bash scripts/inventory.sh "$EVIDENCE_DIR"
+        run: bash scripts/inventory.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
 
       - name: Assert evidence
         shell: bash
-        run: bash scripts/assert-evidence.sh "$EVIDENCE_DIR"
+        run: bash scripts/assert-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
 
       - name: Assemble evidence
         shell: bash
-        run: bash scripts/assemble-evidence.sh "$EVIDENCE_DIR"
+        run: bash scripts/assemble-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr"
 
       - name: Upload PR evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: gooo-incremental-conformance-planner-pr-${{ github.run_id }}
-          path: ${{ env.EVIDENCE_DIR }}
+          path: ${{ runner.temp }}/gooo-incremental-conformance-planner-pr
           if-no-files-found: warn
           retention-days: 14

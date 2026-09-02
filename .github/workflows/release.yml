@@ -11,7 +11,6 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      EVIDENCE_DIR: ${{ runner.temp }}/gooo-incremental-conformance-planner-main
       RELEASE_TAG: v0.1.0
     steps:
       - name: Checkout
@@ -47,7 +46,7 @@ jobs:
 
       - name: Measure build and test
         shell: bash
-        run: bash scripts/ci-measure.sh "$EVIDENCE_DIR/measure"
+        run: bash scripts/ci-measure.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/measure"
 
       - name: Vet
         shell: bash
@@ -55,26 +54,26 @@ jobs:
 
       - name: Run fixed conformance
         shell: bash
-        run: bash scripts/conformance.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$EVIDENCE_DIR/conformance"
+        run: bash scripts/conformance.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/conformance"
 
       - name: Record inventory
         shell: bash
-        run: bash scripts/inventory.sh "$EVIDENCE_DIR"
+        run: bash scripts/inventory.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main"
 
       - name: Assert evidence
         shell: bash
-        run: bash scripts/assert-evidence.sh "$EVIDENCE_DIR"
+        run: bash scripts/assert-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main"
 
       - name: Assemble evidence
         shell: bash
-        run: bash scripts/assemble-evidence.sh "$EVIDENCE_DIR"
+        run: bash scripts/assemble-evidence.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main"
 
       - name: Build immutable evidence asset
         shell: bash
         run: |
           set -Eeuo pipefail
           asset="$RUNNER_TEMP/gooo-incremental-conformance-planner-${RELEASE_TAG}-evidence.tar.gz"
-          tar -czf "$asset" -C "$EVIDENCE_DIR" .
+          tar -czf "$asset" -C "$RUNNER_TEMP/gooo-incremental-conformance-planner-main" .
           digest=$(sha256sum "$asset" | awk '{print $1}')
           printf 'asset=%s\ndigest=sha256:%s\n' "$asset" "$digest" > "$RUNNER_TEMP/release-asset.txt"
 
@@ -128,7 +127,7 @@ jobs:
           gh api --header 'Accept: application/octet-stream' "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id" > "$RUNNER_TEMP/downloaded-evidence.tar.gz"
           downloaded="sha256:$(sha256sum "$RUNNER_TEMP/downloaded-evidence.tar.gz" | awk '{print $1}')"
           test "$downloaded" = "$expected"
-          jq -n --arg tag "$RELEASE_TAG" --arg commit "$GITHUB_SHA" --arg asset "$asset" --arg expected "$expected" --arg downloaded "$downloaded" --argjson asset_id "$asset_id" '{tag:$tag, commit_sha:$commit, asset:$asset, asset_id:$asset_id, expected_digest:$expected, downloaded_digest:$downloaded, draft_verified:true}' > "$EVIDENCE_DIR/release-verification.json"
+          jq -n --arg tag "$RELEASE_TAG" --arg commit "$GITHUB_SHA" --arg asset "$asset" --arg expected "$expected" --arg downloaded "$downloaded" --argjson asset_id "$asset_id" '{tag:$tag, commit_sha:$commit, asset:$asset, asset_id:$asset_id, expected_digest:$expected, downloaded_digest:$downloaded, draft_verified:true}' > "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/release-verification.json"
 
       - name: Publish verified draft without rewriting it
         shell: bash
@@ -144,6 +143,6 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gooo-incremental-conformance-planner-main-${{ github.run_id }}
-          path: ${{ env.EVIDENCE_DIR }}
+          path: ${{ runner.temp }}/gooo-incremental-conformance-planner-main
           if-no-files-found: warn
           retention-days: 90
