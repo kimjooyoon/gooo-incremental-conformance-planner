@@ -1,6 +1,9 @@
 package planner
 
-import "testing"
+import (
+	"path/filepath"
+	"testing"
+)
 
 func TestIdentityRequiresAllSixDigests(t *testing.T) {
 	identity := CacheIdentity{SourceDigest: "source", SemanticIRDigest: "ir", FixtureDigest: "fixture", ContractDigest: "contract", GoToolchainDigest: "toolchain"}
@@ -28,6 +31,52 @@ func TestImpactClosurePropagatesForward(t *testing.T) {
 	impact, refutations := computeImpact(before, after)
 	if len(refutations) != 0 || !intersects([]string{"c"}, impact.ImpactedNodes) {
 		t.Fatalf("impact = %+v, refutations = %+v", impact, refutations)
+	}
+}
+
+func TestMetaOwnsUnknownClassesAndFixedPointCases(t *testing.T) {
+	meta, err := ParseMeta(filepath.Join("..", "..", ".gooo", "incremental-conformance-planner.gooo"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(meta.UnknownClasses) != 4 || len(meta.FixedPointRules) != 3 || len(meta.FixedPointCases) != 3 {
+		t.Fatalf("meta unknown/fixed-point declarations = %v/%v/%v", meta.UnknownClasses, meta.FixedPointRules, meta.FixedPointCases)
+	}
+}
+
+func TestUnknownTopDecisionCannotBecomeFixedPoint(t *testing.T) {
+	meta, err := ParseMeta(filepath.Join("..", "..", ".gooo", "incremental-conformance-planner.gooo"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	fixture, err := LoadFixture(filepath.Join("..", "..", "fixtures", "cases", "unmatched-before-after.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	report, err := Plan(meta, fixture, "contract:test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Decision != DecisionUnknown || report.UnknownClass != "UNMATCHED_BEFORE_AFTER_IDENTITY" || report.FixedPoint.State != FixedPointUnknown {
+		t.Fatalf("report = %+v", report)
+	}
+}
+
+func TestImplicitFixedPointCounterexampleIsRefuted(t *testing.T) {
+	meta, err := ParseMeta(filepath.Join("..", "..", ".gooo", "incremental-conformance-planner.gooo"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	fixture, err := LoadFixture(filepath.Join("..", "..", "fixtures", "cases", "known-counterexample.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	report, err := Plan(meta, fixture, "contract:test")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if report.Decision != DecisionRefuted || report.FixedPoint.State != FixedPointRefuted {
+		t.Fatalf("report = %+v", report)
 	}
 }
 

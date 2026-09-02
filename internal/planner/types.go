@@ -19,6 +19,14 @@ const (
 	OperationalRefuted = "OPERATIONAL_REFUTED"
 	ToolchainVersion   = "go1.27.0"
 
+	FixedPointState         = "FIXED_POINT"
+	FixedPointUnknown       = "UNKNOWN"
+	FixedPointRefuted       = "REFUTED"
+	FixedPointNotApplicable = "NOT_APPLICABLE"
+	FixedPointExplicitKind  = "EXPLICIT_FIXED_POINT"
+	FixedPointImplicitKind  = "IMPLICIT_FIXED_POINT"
+	FixedPointMalformedKind = "MALFORMED_FIXED_POINT"
+
 	IndicatorObserved = "OBSERVED"
 	IndicatorUnknown  = "UNKNOWN"
 	IndicatorRefuted  = "REFUTED"
@@ -47,6 +55,21 @@ var RequiredAuthorities = []string{
 	"CacheIdentity",
 	"ReuseRule",
 	"ExecutionPlan",
+	"UnknownClass",
+	"FixedPointRule",
+}
+
+var RequiredUnknownClasses = []string{
+	"MISSING_IDENTITY",
+	"MISSING_CACHE_RECEIPT",
+	"STALE_TOOLCHAIN",
+	"UNMATCHED_BEFORE_AFTER_IDENTITY",
+}
+
+var RequiredFixedPointRules = []string{
+	"FIXED_POINT_ONLY_IF_EXPLICIT",
+	"UNKNOWN_TOP_DECISION_FAIL_CLOSED",
+	"MALFORMED_OR_IMPLICIT_FIXED_POINT_REFUTED",
 }
 
 type Meta struct {
@@ -60,6 +83,9 @@ type Meta struct {
 	CacheIdentity    string
 	ReuseRules       []string
 	ExecutionPlan    string
+	UnknownClasses   []string
+	FixedPointRules  []string
+	FixedPointCases  []FixedPointCase
 	Activities       []string
 	ProofCells       []Cell
 	IndicatorCells   []Cell
@@ -72,6 +98,11 @@ type Meta struct {
 type Cell struct {
 	State string `json:"state"`
 	ID    string `json:"id"`
+}
+
+type FixedPointCase struct {
+	ID   string
+	Mode string
 }
 
 type OptionalInput struct {
@@ -188,6 +219,8 @@ type Fixture struct {
 	CaseID         string               `json:"case_id"`
 	Description    string               `json:"description"`
 	Kind           string               `json:"kind"`
+	UnknownClass   string               `json:"unknown_class,omitempty"`
+	FixedPoint     *FixedPointEvidence  `json:"fixed_point,omitempty"`
 	Before         SemanticGraph        `json:"before"`
 	After          SemanticGraph        `json:"after"`
 	Units          []ValidationUnit     `json:"units"`
@@ -197,8 +230,23 @@ type Fixture struct {
 }
 
 type Expected struct {
-	Decision string            `json:"decision"`
-	Actions  map[string]string `json:"actions"`
+	Decision     string            `json:"decision"`
+	UnknownClass string            `json:"unknown_class,omitempty"`
+	Actions      map[string]string `json:"actions"`
+}
+
+type FixedPointEvidence struct {
+	Declared bool   `json:"declared"`
+	Kind     string `json:"kind"`
+	Witness  string `json:"witness"`
+}
+
+type FixedPointAssessment struct {
+	State    string `json:"state"`
+	Declared bool   `json:"declared"`
+	CaseMode string `json:"case_mode,omitempty"`
+	Rule     string `json:"rule"`
+	Reason   string `json:"reason"`
 }
 
 type ImpactClosure struct {
@@ -227,6 +275,7 @@ type UnitPlan struct {
 type Evidence struct {
 	Stage     string   `json:"stage"`
 	Step      string   `json:"step"`
+	Class     string   `json:"unknown_class,omitempty"`
 	Reason    string   `json:"reason"`
 	Next      string   `json:"next_operation"`
 	BlockedBy []string `json:"blocked_by"`
@@ -260,6 +309,8 @@ type Report struct {
 	Impact         ImpactClosure          `json:"semantic_impact"`
 	Units          []UnitPlan             `json:"unit_vector"`
 	Indicators     []IndicatorObservation `json:"indicator_vector"`
+	UnknownClass   string                 `json:"unknown_class,omitempty"`
+	FixedPoint     FixedPointAssessment   `json:"fixed_point"`
 	Unknowns       []Evidence             `json:"unknown_evidence,omitempty"`
 	Refutations    []Evidence             `json:"refutation_evidence,omitempty"`
 	OptionalSlicer OptionalSlicerStatus   `json:"optional_slicer"`

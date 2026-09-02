@@ -1,8 +1,9 @@
 {
   "schema": "gooo/incremental-conformance-planner/fixture/v1",
   "case_id": "exact-cache-hit",
-  "description": "Every validation unit has an immutable PASS receipt with an exact six-field identity.",
+  "description": "Every validation unit has an immutable PASS receipt with an exact six-field identity and an explicit fixed-point declaration.",
   "kind": "CLOSED",
+  "fixed_point": {"declared": true, "kind": "EXPLICIT_FIXED_POINT", "witness": "all-units-exact-identity-and-matched-indicators"},
   "before": {
     "nodes": [{"id": "api", "digest": "ir:api:v1"}, {"id": "parser", "digest": "ir:parser:v1"}, {"id": "storage", "digest": "ir:storage:v1"}, {"id": "ui", "digest": "ir:ui:v1"}],
     "edges": [{"from": "api", "to": "parser", "relation": "causal"}, {"from": "parser", "to": "storage", "relation": "causal"}, {"from": "storage", "to": "ui", "relation": "causal"}]

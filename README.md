@@ -44,6 +44,11 @@ toolchain, missing fixture digest, semantic impact propagation, known failed
 test, unrelated change, graph contradiction, counterexample, missing receipt,
 and unmatched before/after evidence.
 
+The `.gooo` source also owns the `unknown_class` enum and the fixed-point
+rules. `FIXED_POINT` is only an explicit case assessment, never a top-level
+decision. An UNKNOWN top decision remains fail-closed UNKNOWN, while malformed
+or implicit fixed-point counterexamples remain REFUTED.
+
 ## Optional slicer input
 
 An immutable, digest-pinned `gooo-semantic-impact-slicer` `v0.1.1` release may
@@ -72,7 +77,8 @@ The release workflow runs only from `main`, after a green PR merge. The
 previous `v0.1.0` release was audited as `platform_immutable=false` and is
 preserved as an `OPERATIONAL_REFUTED_PRESERVED` lineage record. The repository
 immutable-release setting is activated once, and future release publication is
-draft-first. The workflow now creates one annotated `v0.1.1` tag, uploads one
+draft-first. The preceding `v0.1.1` release is immutable and remains
+unchanged. The workflow now creates one annotated `v0.1.2` tag, uploads one
 evidence asset, verifies the tag target and asset digest, requires the
 platform immutable flag after publication, and never deletes or recreates
 failed release state.

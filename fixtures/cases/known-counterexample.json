@@ -1,8 +1,9 @@
 {
   "schema": "gooo/incremental-conformance-planner/fixture/v1",
   "case_id": "known-counterexample",
-  "description": "A counterexample receipt is evidence against the candidate; it remains REFUTED and is never a reusable PASS.",
+  "description": "A counterexample receipt is also an implicit fixed-point claim; the malformed claim remains REFUTED and is never a reusable PASS.",
   "kind": "REFUTED",
+  "fixed_point": {"declared": false, "kind": "IMPLICIT_FIXED_POINT", "witness": "counterexample-receipt-without-explicit-fixed-point-authority"},
   "before": {"nodes": [{"id": "api", "digest": "ir:api:v1"}, {"id": "parser", "digest": "ir:parser:v1"}, {"id": "storage", "digest": "ir:storage:v1"}, {"id": "ui", "digest": "ir:ui:v1"}], "edges": []},
   "after": {"nodes": [{"id": "api", "digest": "ir:api:v1"}, {"id": "parser", "digest": "ir:parser:v1"}, {"id": "storage", "digest": "ir:storage:v2"}, {"id": "ui", "digest": "ir:ui:v1"}], "edges": []},
   "units": [

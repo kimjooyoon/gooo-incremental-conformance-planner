@@ -13,6 +13,18 @@ The Go package rejects a `.gooo` file that changes the precedence, omits one
 of the authority declarations, changes the activity cardinality, or changes
 the 4/4/4 cell partitions.
 
+## UNKNOWN and FIXED_POINT authority
+
+The `.gooo` source owns the `unknown_class` enum. The four fixed UNKNOWN cases
+declare `MISSING_IDENTITY`, `MISSING_CACHE_RECEIPT`, `STALE_TOOLCHAIN`, or
+`UNMATCHED_BEFORE_AFTER_IDENTITY`; the parser validates those literals and the
+evaluator carries the class into UNKNOWN evidence.
+
+`FIXED_POINT` is not a fourth top-level decision. It is accepted only for an
+explicitly declared case owned by `.gooo`. An UNKNOWN top decision is
+fail-closed and is never promoted to `FIXED_POINT`. A malformed or implicit
+fixed-point counterexample is `REFUTED` and remains preserved evidence.
+
 ## Unit decision rule
 
 The planner evaluates each unit independently, then resolves the plan state

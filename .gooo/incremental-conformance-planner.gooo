@@ -9,6 +9,8 @@ authority SemanticDependency
 authority CacheIdentity
 authority ReuseRule
 authority ExecutionPlan
+authority UnknownClass
+authority FixedPointRule
 
 validation_unit unit_id source_ref command_descriptor semantic_nodes
 semantic_dependency from to relation
@@ -17,6 +19,13 @@ reuse_rule EXACT_IDENTITY_ONLY
 reuse_rule PASS_IMMUTABLE_ONLY
 reuse_rule FAILED_OR_COUNTEREXAMPLE_NEVER_REUSED
 execution_plan EXECUTE REUSE UNKNOWN REFUTED
+unknown_class enum MISSING_IDENTITY MISSING_CACHE_RECEIPT STALE_TOOLCHAIN UNMATCHED_BEFORE_AFTER_IDENTITY
+fixed_point_rule FIXED_POINT_ONLY_IF_EXPLICIT
+fixed_point_rule UNKNOWN_TOP_DECISION_FAIL_CLOSED
+fixed_point_rule MALFORMED_OR_IMPLICIT_FIXED_POINT_REFUTED
+fixed_point_case exact-cache-hit EXPLICIT_FIXED_POINT
+fixed_point_case unmatched-before-after FAIL_CLOSED_UNKNOWN
+fixed_point_case known-counterexample MALFORMED_OR_IMPLICIT_COUNTEREXAMPLE
 
 meta_activity parse-gooo
 meta_activity resolve-validation-units
