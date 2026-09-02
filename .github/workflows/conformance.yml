@@ -41,6 +41,10 @@ jobs:
         shell: bash
         run: bash -n scripts/*.sh
 
+      - name: Check immutable release policy
+        shell: bash
+        run: bash scripts/assert-immutable-release-policy.sh
+
       - name: Measure build and test
         shell: bash
         run: bash scripts/ci-measure.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-pr/measure"

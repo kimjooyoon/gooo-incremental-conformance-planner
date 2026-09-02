@@ -11,7 +11,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      RELEASE_TAG: v0.1.0
+      RELEASE_TAG: v0.1.1
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -44,6 +44,20 @@ jobs:
       - name: Check shell syntax
         shell: bash
         run: bash -n scripts/*.sh
+
+      - name: Check immutable release policy
+        shell: bash
+        run: bash scripts/assert-immutable-release-policy.sh
+
+      - name: Verify repository immutable releases setting
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # shellcheck disable=SC2016
+          set -Eeuo pipefail
+          settings=$(gh api "repos/$GITHUB_REPOSITORY/immutable-releases")
+          jq -e '.enabled == true' <<<"$settings" >/dev/null
 
       - name: Measure build and test
         shell: bash
@@ -158,7 +172,12 @@ jobs:
           # shellcheck disable=SC2016
           set -Eeuo pipefail
           gh release edit "$RELEASE_TAG" --draft=false
-          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" | jq -e '.draft == false' >/dev/null
+          published_json="$RUNNER_TEMP/published-release.json"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$published_json"
+          jq -e '.draft == false and .immutable == true' "$published_json" >/dev/null
+          platform_immutable=$(jq -r '.immutable' "$published_json")
+          jq --argjson platform_immutable "$platform_immutable" '. + {published:true, draft:false, platform_immutable:$platform_immutable}' "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/release-verification.json" > "$RUNNER_TEMP/release-verification-published.json"
+          mv "$RUNNER_TEMP/release-verification-published.json" "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/release-verification.json"
 
       - name: Upload main evidence
         if: always()
