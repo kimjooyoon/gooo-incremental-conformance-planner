@@ -10,7 +10,7 @@ The repository immutable-release setting is activated exactly once after that
 audit. Future releases use this draft-first policy:
 
 1. A PR must pass the PR workflow and be merged to `main`.
-2. The main workflow verifies the repository immutable-release setting.
+2. The main workflow enforces the recorded repository immutable-release policy.
 3. It creates one annotated `v0.1.1` tag and a draft release.
 4. It uploads one evidence asset and verifies the tag target and downloaded
    asset digest.
