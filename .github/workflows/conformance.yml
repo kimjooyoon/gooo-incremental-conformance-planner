@@ -1,6 +1,7 @@
 name: PR conformance
 
 on:
+  push:
   pull_request:
     branches: [main]
 
