@@ -19,12 +19,12 @@ const (
 	OperationalRefuted = "OPERATIONAL_REFUTED"
 	ToolchainVersion   = "go1.27.0"
 
-	FixedPointState       = "FIXED_POINT"
-	FixedPointUnknown     = "UNKNOWN"
-	FixedPointRefuted     = "REFUTED"
+	FixedPointState         = "FIXED_POINT"
+	FixedPointUnknown       = "UNKNOWN"
+	FixedPointRefuted       = "REFUTED"
 	FixedPointNotApplicable = "NOT_APPLICABLE"
-	FixedPointExplicitKind = "EXPLICIT_FIXED_POINT"
-	FixedPointImplicitKind = "IMPLICIT_FIXED_POINT"
+	FixedPointExplicitKind  = "EXPLICIT_FIXED_POINT"
+	FixedPointImplicitKind  = "IMPLICIT_FIXED_POINT"
 	FixedPointMalformedKind = "MALFORMED_FIXED_POINT"
 
 	IndicatorObserved = "OBSERVED"
