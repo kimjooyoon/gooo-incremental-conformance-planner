@@ -14,7 +14,7 @@
   "receipt_defaults": {
     "state": "PASS", "immutable": true,
     "identity": {"digests": {"source_digest": "sha256:bf565366885e78b4260f6e75b966b99a3e053e5fe7e6374f02db9fffc30766f8", "semantic_ir_digest": "sha256:1f72abac6037846b8c7a214d49c5d6bad1c8e562cebf078ce23e619a1d2bddea", "fixture_digest": "sha256:94f2e9a2c5967a2bf066df4c9f5ab49faff904aa108d5dd5dab942fbb79ede1c", "contract_digest": "sha256:45c295e7362f454d984c5771f0261c1a53fd70fcb1453ea5edd0075659e3c356", "evaluator_digest": "sha256:985c4d1641b9ae461a392ebf288ab415d84550d5df1f31943bfba8af2417c3b9", "go_toolchain_digest": "sha256:go1.27.0"}, "activity": {"scenario_digest": "sha256:scenario-forged-receipt", "build_activity_id": "build:gooo-v2", "test_activity_id": "test:gooo-v2"}},
-    "result_digest": "sha256:result-forged-receipt", "receipt_digest": "sha256:receipt-forged", "content_digest": "sha256:receipt-content", "source_run_id": "actions-forged-receipt", "source_commit": "commit-forged-receipt", "proof_source": "INDEPENDENT_CI"
+    "result_digest": "sha256:result-valid-default", "receipt_digest": "sha256:receipt-valid-default", "content_digest": "sha256:receipt-valid-default", "source_run_id": "actions-forged-receipt", "source_commit": "commit-forged-receipt", "proof_source": "INDEPENDENT_CI"
   },
   "observation_defaults": {"status": "SKIPPED_WITH_PROOF", "duration_ms": null, "build_ms": null, "test_ms": null, "wall_ms": null, "peak_rss_kib": null, "cache_hit": true, "cache_miss": false},
   "activities": [
