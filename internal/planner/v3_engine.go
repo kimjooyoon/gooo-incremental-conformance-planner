@@ -131,7 +131,7 @@ func RunV3Suite(options V3SuiteOptions) (V3SuiteReport, error) {
 		ProofTotals: contract.ProofTotals, IndicatorTotals: contract.IndicatorTotals, Cases: caseResults,
 		LegacyExactReuseClosed: legacyExactReuseClosed, ActionsReceipt: actions, ActionsMetricState: actionsMetricState,
 		MissingActionsMetrics: missingActionsMetrics,
-		Operational: V3Operational{RepositoryWrites: 0, LocalTestExecutions: 0, CrossProjectRequiredGates: 0, FailedRunsPreserved: true, OutputLocation: options.OutputDir, VerificationAuthority: "GitHub Actions"},
+		Operational:           V3Operational{RepositoryWrites: 0, LocalTestExecutions: 0, CrossProjectRequiredGates: 0, FailedRunsPreserved: true, OutputLocation: options.OutputDir, VerificationAuthority: "GitHub Actions"},
 	}
 	if err := writeJSON(filepath.Join(options.OutputDir, "suite-report.json"), suite); err != nil {
 		return V3SuiteReport{}, err
@@ -316,7 +316,7 @@ func EvaluateV3(ir V3SemanticIR, contract V3Contract, fixture V3Fixture, project
 		Activities: plans, Summary: summarizeV3(plans), Indicators: indicators, Unknowns: unknowns, RefutedReasons: refutedReasons,
 		ContractDigest: contractDigest, FixtureDigest: fixtureDigest, EvaluatorDigest: ir.EvaluatorDigest, ActionsReceipt: actions,
 		FixedPointState: fixedPointState,
-		Operational: V3Operational{RepositoryWrites: 0, LocalTestExecutions: 0, CrossProjectRequiredGates: 0, FailedRunsPreserved: true, OutputLocation: "caller-owned", VerificationAuthority: "GitHub Actions"},
+		Operational:     V3Operational{RepositoryWrites: 0, LocalTestExecutions: 0, CrossProjectRequiredGates: 0, FailedRunsPreserved: true, OutputLocation: "caller-owned", VerificationAuthority: "GitHub Actions"},
 	}
 }
 
@@ -450,8 +450,8 @@ func v3AuthorityMismatches(identity V3VerificationIdentity, ir V3SemanticIR, con
 func v3IdentityMismatches(current, prior V3VerificationIdentity) []string {
 	result := []string{}
 	values := []struct {
-		name string
-		left string
+		name  string
+		left  string
 		right string
 	}{
 		{"test_identity", current.TestIdentity, prior.TestIdentity}, {"conformance_identity", current.ConformanceIdentity, prior.ConformanceIdentity},
@@ -645,4 +645,3 @@ func writeV3Report(outputDir string, report V3Report) error {
 	}
 	return writeText(filepath.Join(outputDir, "human-report.md"), RenderV3Report(report))
 }
-
