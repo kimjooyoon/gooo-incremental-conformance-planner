@@ -9,10 +9,10 @@ import (
 )
 
 type V2SuiteOptions struct {
-	MetaPath          string
-	ContractPath      string
-	CasesRoot         string
-	OutputDir         string
+	MetaPath           string
+	ContractPath       string
+	CasesRoot          string
+	OutputDir          string
 	ActionsReceiptPath string
 }
 
@@ -171,10 +171,10 @@ func sameV2Activities(source, contract []V2ActivityDescriptor) bool {
 }
 
 type V2EvaluatorArtifact struct {
-	Schema          string                 `json:"schema"`
-	SemanticIRDigest string                `json:"semantic_ir_digest"`
-	Digest          string                 `json:"digest"`
-	Activities      []V2ActivityDescriptor `json:"activities"`
+	Schema           string                 `json:"schema"`
+	SemanticIRDigest string                 `json:"semantic_ir_digest"`
+	Digest           string                 `json:"digest"`
+	Activities       []V2ActivityDescriptor `json:"activities"`
 }
 
 func ProjectV2(ir V2SemanticIR, contract V2Contract, fixture V2Fixture) (V2Projection, error) {
@@ -369,12 +369,24 @@ func priorState(receipt *V2PriorReceipt) string {
 
 func v2IdentityMismatches(current, prior V2IdentityBundle) []string {
 	result := []string{}
-	if current.Digests.SourceDigest != prior.Digests.SourceDigest { result = append(result, "source_digest") }
-	if current.Digests.SemanticIRDigest != prior.Digests.SemanticIRDigest { result = append(result, "semantic_ir_digest") }
-	if current.Digests.FixtureDigest != prior.Digests.FixtureDigest { result = append(result, "fixture_digest") }
-	if current.Digests.ContractDigest != prior.Digests.ContractDigest { result = append(result, "contract_digest") }
-	if current.Digests.GoToolchainDigest != prior.Digests.GoToolchainDigest { result = append(result, "go_toolchain_digest") }
-	if !current.Activity.Equal(prior.Activity) { result = append(result, "activity_identity") }
+	if current.Digests.SourceDigest != prior.Digests.SourceDigest {
+		result = append(result, "source_digest")
+	}
+	if current.Digests.SemanticIRDigest != prior.Digests.SemanticIRDigest {
+		result = append(result, "semantic_ir_digest")
+	}
+	if current.Digests.FixtureDigest != prior.Digests.FixtureDigest {
+		result = append(result, "fixture_digest")
+	}
+	if current.Digests.ContractDigest != prior.Digests.ContractDigest {
+		result = append(result, "contract_digest")
+	}
+	if current.Digests.GoToolchainDigest != prior.Digests.GoToolchainDigest {
+		result = append(result, "go_toolchain_digest")
+	}
+	if !current.Activity.Equal(prior.Activity) {
+		result = append(result, "activity_identity")
+	}
 	return result
 }
 
@@ -391,25 +403,49 @@ func summarizeV2(plans []V2ActivityPlan) V2DossierSummary {
 		case V2ActionRefuted:
 			summary.Refuted++
 		}
-		if plan.Executed { summary.Executed++ }
-		if plan.SkippedWithProof { summary.SkippedWithProof++ }
+		if plan.Executed {
+			summary.Executed++
+		}
+		if plan.SkippedWithProof {
+			summary.SkippedWithProof++
+		}
 	}
 	return summary
 }
 
 func computeV2Impact(before, after V2ProofGraph, declared V2ChangeSet) ([]string, []string, []string) {
 	beforeNodes, afterNodes := map[string]V2GraphNode{}, map[string]V2GraphNode{}
-	for _, node := range before.Nodes { beforeNodes[node.ID] = node }
-	for _, node := range after.Nodes { afterNodes[node.ID] = node }
+	for _, node := range before.Nodes {
+		beforeNodes[node.ID] = node
+	}
+	for _, node := range after.Nodes {
+		afterNodes[node.ID] = node
+	}
 	changed := map[string]bool{}
 	for id, oldNode := range beforeNodes {
 		newNode, ok := afterNodes[id]
-		if !ok || oldNode.Digest != newNode.Digest { changed[id] = true }
+		if !ok || oldNode.Digest != newNode.Digest {
+			changed[id] = true
+		}
 	}
-	for id := range afterNodes { if _, ok := beforeNodes[id]; !ok { changed[id] = true } }
+	for id := range afterNodes {
+		if _, ok := beforeNodes[id]; !ok {
+			changed[id] = true
+		}
+	}
 	beforeEdges, afterEdges := v2EdgeSet(before.Edges), v2EdgeSet(after.Edges)
-	for key, edge := range beforeEdges { if _, ok := afterEdges[key]; !ok { changed[edge.From] = true; changed[edge.To] = true } }
-	for key, edge := range afterEdges { if _, ok := beforeEdges[key]; !ok { changed[edge.From] = true; changed[edge.To] = true } }
+	for key, edge := range beforeEdges {
+		if _, ok := afterEdges[key]; !ok {
+			changed[edge.From] = true
+			changed[edge.To] = true
+		}
+	}
+	for key, edge := range afterEdges {
+		if _, ok := beforeEdges[key]; !ok {
+			changed[edge.From] = true
+			changed[edge.To] = true
+		}
+	}
 	changedIDs := sortedMapKeys(changed)
 	reasons := []string{}
 	if declared.BeforeDigest == "" || declared.AfterDigest == "" || len(declared.ChangedNodes) == 0 && len(changedIDs) > 0 || !sameStringSet(declared.ChangedNodes, changedIDs) {
@@ -423,15 +459,23 @@ func computeV2Impact(before, after V2ProofGraph, declared V2ChangeSet) ([]string
 		}
 	}
 	impacted := map[string]bool{}
-	for _, id := range changedIDs { impacted[id] = true }
+	for _, id := range changedIDs {
+		impacted[id] = true
+	}
 	queue := append([]string(nil), changedIDs...)
 	closureEdges := map[string]bool{}
 	for len(queue) > 0 {
-		current := queue[0]; queue = queue[1:]
+		current := queue[0]
+		queue = queue[1:]
 		for _, edge := range after.Edges {
-			if edge.From != current { continue }
+			if edge.From != current {
+				continue
+			}
 			closureEdges[edge.From+"->"+edge.To] = true
-			if !impacted[edge.To] { impacted[edge.To] = true; queue = append(queue, edge.To) }
+			if !impacted[edge.To] {
+				impacted[edge.To] = true
+				queue = append(queue, edge.To)
+			}
 		}
 	}
 	return sortedMapKeys(impacted), sortedMapKeys(closureEdges), uniqueStrings(reasons)
@@ -439,28 +483,45 @@ func computeV2Impact(before, after V2ProofGraph, declared V2ChangeSet) ([]string
 
 func v2EdgeSet(edges []V2GraphEdge) map[string]V2GraphEdge {
 	result := map[string]V2GraphEdge{}
-	for _, edge := range edges { result[edge.From+"->"+edge.To+"#"+edge.Relation] = edge }
+	for _, edge := range edges {
+		result[edge.From+"->"+edge.To+"#"+edge.Relation] = edge
+	}
 	return result
 }
 
 func sameStringSet(left, right []string) bool {
-	left = sortedStrings(left); right = sortedStrings(right)
-	if len(left) != len(right) { return false }
-	for index := range left { if left[index] != right[index] { return false } }
+	left = sortedStrings(left)
+	right = sortedStrings(right)
+	if len(left) != len(right) {
+		return false
+	}
+	for index := range left {
+		if left[index] != right[index] {
+			return false
+		}
+	}
 	return true
 }
 
 func uniqueStrings(values []string) []string {
 	seen := map[string]bool{}
 	result := []string{}
-	for _, value := range values { if !seen[value] { seen[value] = true; result = append(result, value) } }
+	for _, value := range values {
+		if !seen[value] {
+			seen[value] = true
+			result = append(result, value)
+		}
+	}
 	sort.Strings(result)
 	return result
 }
 
 func evaluateV2Indicators(pair V2MetricPair) []V2IndicatorObservation {
 	identityPair := pair.BeforeKnown && pair.AfterKnown && pair.ScenarioDigest != "" && len(pair.BeforeIdentity.Missing()) == 0 && len(pair.AfterIdentity.Missing()) == 0 && pair.BeforeIdentity.Activity.ScenarioDigest == pair.ScenarioDigest && pair.AfterIdentity.Activity.ScenarioDigest == pair.ScenarioDigest && pair.BeforeIdentity.Equal(pair.AfterIdentity)
-	metrics := []struct { name string; before, after *int64 }{
+	metrics := []struct {
+		name          string
+		before, after *int64
+	}{
 		{name: "build_ms", before: pair.Before.BuildMS, after: pair.After.BuildMS},
 		{name: "test_ms", before: pair.Before.TestMS, after: pair.After.TestMS},
 		{name: "wall_ms", before: pair.Before.WallMS, after: pair.After.WallMS},
@@ -494,9 +555,17 @@ func sortedV2Cases(cases []V2CaseSpec) []V2CaseSpec {
 }
 
 func writeV2Report(outputDir string, report V2Report) error {
-	if err := os.MkdirAll(outputDir, 0o755); err != nil { return err }
-	if err := writeJSON(filepath.Join(outputDir, "report.json"), report); err != nil { return err }
-	if err := writeJSON(filepath.Join(outputDir, "activity-vector.json"), report.Activities); err != nil { return err }
-	if err := writeJSON(filepath.Join(outputDir, "indicator-vector.json"), report.Indicators); err != nil { return err }
+	if err := os.MkdirAll(outputDir, 0o755); err != nil {
+		return err
+	}
+	if err := writeJSON(filepath.Join(outputDir, "report.json"), report); err != nil {
+		return err
+	}
+	if err := writeJSON(filepath.Join(outputDir, "activity-vector.json"), report.Activities); err != nil {
+		return err
+	}
+	if err := writeJSON(filepath.Join(outputDir, "indicator-vector.json"), report.Indicators); err != nil {
+		return err
+	}
 	return writeText(filepath.Join(outputDir, "human-report.md"), RenderV2Report(report))
 }

@@ -44,26 +44,6 @@ jobs:
             exit 1
           fi
 
-      - name: Export CI-formatted v2 Go sources
-        if: always()
-        shell: bash
-        run: |
-          set -Eeuo pipefail
-          formatted="$RUNNER_TEMP/gooo-incremental-conformance-planner-formatted-go"
-          mkdir -p "$formatted"
-          for file in internal/planner/v2_engine.go internal/planner/v2_parse.go internal/planner/v2_report.go internal/planner/v2_types.go; do
-            gofmt "$file" > "$formatted/$(basename "$file")"
-          done
-
-      - name: Upload CI-formatted v2 Go sources
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: gooo-incremental-conformance-planner-ci-formatted-${{ github.run_id }}
-          path: ${{ runner.temp }}/gooo-incremental-conformance-planner-formatted-go
-          if-no-files-found: error
-          retention-days: 1
-
       - name: Check workflow syntax
         shell: bash
         run: |

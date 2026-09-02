@@ -143,18 +143,18 @@ func validateV2Source(source V2Source) error {
 
 func BuildV2SemanticIR(source V2Source, sourcePath, sourceDigest string) (V2SemanticIR, error) {
 	ir := V2SemanticIR{
-		Schema: "gooo/incremental-conformance-planner/semantic-ir/v2",
+		Schema:  "gooo/incremental-conformance-planner/semantic-ir/v2",
 		Program: source.Program, SourcePath: sourcePath, SourceDigest: sourceDigest, ToolchainDigest: source.ToolchainDigest,
 		IdentityFields: append([]string(nil), source.IdentityFields...),
-		Activities: append([]V2ActivityDescriptor(nil), source.Activities...),
+		Activities:     append([]V2ActivityDescriptor(nil), source.Activities...),
 	}
 	canonical := struct {
-		Schema         string                 `json:"schema"`
-		Program        string                 `json:"program"`
-		SourceDigest   string                 `json:"source_digest"`
-		ToolchainDigest string                `json:"toolchain_digest"`
-		IdentityFields []string               `json:"identity_fields"`
-		Activities     []V2ActivityDescriptor `json:"activities"`
+		Schema          string                 `json:"schema"`
+		Program         string                 `json:"program"`
+		SourceDigest    string                 `json:"source_digest"`
+		ToolchainDigest string                 `json:"toolchain_digest"`
+		IdentityFields  []string               `json:"identity_fields"`
+		Activities      []V2ActivityDescriptor `json:"activities"`
 	}{ir.Schema, ir.Program, ir.SourceDigest, ir.ToolchainDigest, ir.IdentityFields, ir.Activities}
 	digest, err := DigestJSON(canonical)
 	if err != nil {

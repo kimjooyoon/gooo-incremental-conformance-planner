@@ -26,12 +26,16 @@ func RenderV2Report(report V2Report) string {
 	b.WriteString("\nImprovement is null and UNKNOWN unless scenario, source, semantic IR, fixture, contract, evaluator, toolchain, and activity identities match exactly.\n\n")
 	if len(report.UnknownReasons) > 0 {
 		b.WriteString("## UNKNOWN evidence\n\n")
-		for _, reason := range report.UnknownReasons { fmt.Fprintf(&b, "- `%s`\n", reason) }
+		for _, reason := range report.UnknownReasons {
+			fmt.Fprintf(&b, "- `%s`\n", reason)
+		}
 		b.WriteString("\n")
 	}
 	if len(report.RefutedReasons) > 0 {
 		b.WriteString("## REFUTED evidence\n\n")
-		for _, reason := range report.RefutedReasons { fmt.Fprintf(&b, "- `%s`\n", reason) }
+		for _, reason := range report.RefutedReasons {
+			fmt.Fprintf(&b, "- `%s`\n", reason)
+		}
 		b.WriteString("\n")
 	}
 	fmt.Fprintf(&b, "Operational boundary: repository_writes=%d, local_test_executions=%d, cross_project_required_gates=%d, failed_runs_preserved=%t, verification_authority=%s.\n", report.Operational.RepositoryWrites, report.Operational.LocalTestExecutions, report.Operational.CrossProjectRequiredGates, report.Operational.FailedRunsPreserved, report.Operational.VerificationAuthority)
@@ -54,7 +58,11 @@ func RenderV2SuiteReport(report V2SuiteReport) string {
 }
 
 func boolText(value *bool) string {
-	if value == nil { return "UNKNOWN" }
-	if *value { return "true" }
+	if value == nil {
+		return "UNKNOWN"
+	}
+	if *value {
+		return "true"
+	}
 	return "false"
 }

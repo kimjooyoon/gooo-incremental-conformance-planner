@@ -20,13 +20,13 @@ const (
 
 	V2UnknownMissingIdentity   = "MISSING_IDENTITY"
 	V2UnknownMissingProvenance = "MISSING_PROVENANCE"
-	V2UnknownMissingReceipt   = "MISSING_IMMUTABLE_RECEIPT"
-	V2UnknownMissingMetrics   = "MISSING_ACTIONS_METRIC"
+	V2UnknownMissingReceipt    = "MISSING_IMMUTABLE_RECEIPT"
+	V2UnknownMissingMetrics    = "MISSING_ACTIONS_METRIC"
 
-	V2RefutedForgedReceipt       = "FORGED_OR_STALE_RECEIPT"
-	V2RefutedAffectedSkip        = "AFFECTED_ACTIVITY_SKIPPED"
+	V2RefutedForgedReceipt         = "FORGED_OR_STALE_RECEIPT"
+	V2RefutedAffectedSkip          = "AFFECTED_ACTIVITY_SKIPPED"
 	V2RefutedEvaluatorSelfApproval = "EVALUATOR_SELF_APPROVAL"
-	V2RefutedGraph               = "PROOF_GRAPH_CONTRADICTION"
+	V2RefutedGraph                 = "PROOF_GRAPH_CONTRADICTION"
 )
 
 var V2IdentityDigestFields = []string{
@@ -45,17 +45,17 @@ var V2ActivityIdentityFields = []string{
 }
 
 type V2Source struct {
-	Schema          string
-	Program         string
-	Namespace       string
-	Precedence      []string
-	Authorities     []string
-	IdentityFields  []string
-	UnknownClasses  []string
-	ToolchainDigest string
-	ProofChoices    []string
+	Schema           string
+	Program          string
+	Namespace        string
+	Precedence       []string
+	Authorities      []string
+	IdentityFields   []string
+	UnknownClasses   []string
+	ToolchainDigest  string
+	ProofChoices     []string
 	IndicatorClasses []string
-	Activities      []V2ActivityDescriptor
+	Activities       []V2ActivityDescriptor
 }
 
 type V2ActivityDescriptor struct {
@@ -111,9 +111,9 @@ func (identity V2CacheIdentity) Equal(other V2CacheIdentity) bool {
 }
 
 type V2ActivityIdentity struct {
-	ScenarioDigest   string `json:"scenario_digest"`
-	BuildActivityID  string `json:"build_activity_id"`
-	TestActivityID   string `json:"test_activity_id"`
+	ScenarioDigest  string `json:"scenario_digest"`
+	BuildActivityID string `json:"build_activity_id"`
+	TestActivityID  string `json:"test_activity_id"`
 }
 
 func (identity V2ActivityIdentity) Missing() []string {
@@ -134,7 +134,7 @@ func (identity V2ActivityIdentity) Equal(other V2ActivityIdentity) bool {
 }
 
 type V2IdentityBundle struct {
-	Digests  V2CacheIdentity   `json:"digests"`
+	Digests  V2CacheIdentity    `json:"digests"`
 	Activity V2ActivityIdentity `json:"activity"`
 }
 
@@ -163,15 +163,15 @@ type V2PriorReceipt struct {
 }
 
 type V2ActivityObservation struct {
-	ActivityID   string `json:"activity_id,omitempty"`
-	Status       string `json:"status"`
-	DurationMS   *int64 `json:"duration_ms"`
-	BuildMS      *int64 `json:"build_ms"`
-	TestMS       *int64 `json:"test_ms"`
-	WallMS       *int64 `json:"wall_ms"`
-	PeakRSSKiB   *int64 `json:"peak_rss_kib"`
-	CacheHit     *bool  `json:"cache_hit"`
-	CacheMiss    *bool  `json:"cache_miss"`
+	ActivityID string `json:"activity_id,omitempty"`
+	Status     string `json:"status"`
+	DurationMS *int64 `json:"duration_ms"`
+	BuildMS    *int64 `json:"build_ms"`
+	TestMS     *int64 `json:"test_ms"`
+	WallMS     *int64 `json:"wall_ms"`
+	PeakRSSKiB *int64 `json:"peak_rss_kib"`
+	CacheHit   *bool  `json:"cache_hit"`
+	CacheMiss  *bool  `json:"cache_miss"`
 }
 
 type V2MetricVector struct {
@@ -217,28 +217,28 @@ type V2ChangeSet struct {
 }
 
 type V2ActivityInput struct {
-	ActivityID      string                `json:"activity_id"`
-	SemanticNodes   []string              `json:"semantic_nodes"`
-	CurrentIdentity *V2IdentityBundle     `json:"current_identity"`
-	PriorReceipt    *V2PriorReceipt       `json:"prior_receipt"`
+	ActivityID      string                 `json:"activity_id"`
+	SemanticNodes   []string               `json:"semantic_nodes"`
+	CurrentIdentity *V2IdentityBundle      `json:"current_identity"`
+	PriorReceipt    *V2PriorReceipt        `json:"prior_receipt"`
 	Observation     *V2ActivityObservation `json:"observation"`
 }
 
 type V2Fixture struct {
-	Schema              string                   `json:"schema"`
-	CaseID              string                   `json:"case_id"`
-	Description         string                   `json:"description"`
-	Kind                string                   `json:"kind"`
-	FixtureAnchor       string                   `json:"fixture_anchor"`
-	SemanticChange      V2ChangeSet             `json:"semantic_change"`
-	Before              V2ProofGraph            `json:"before"`
-	After               V2ProofGraph             `json:"after"`
-	IdentityDefaults    V2IdentityBundle        `json:"identity_defaults"`
-	ReceiptDefaults     *V2PriorReceipt         `json:"receipt_defaults"`
-	ObservationDefaults V2ActivityObservation  `json:"observation_defaults"`
-	Activities          []V2ActivityInput       `json:"activities"`
-	Indicators          V2MetricPair            `json:"indicators"`
-	Expected            V2Expected              `json:"expected"`
+	Schema              string                `json:"schema"`
+	CaseID              string                `json:"case_id"`
+	Description         string                `json:"description"`
+	Kind                string                `json:"kind"`
+	FixtureAnchor       string                `json:"fixture_anchor"`
+	SemanticChange      V2ChangeSet           `json:"semantic_change"`
+	Before              V2ProofGraph          `json:"before"`
+	After               V2ProofGraph          `json:"after"`
+	IdentityDefaults    V2IdentityBundle      `json:"identity_defaults"`
+	ReceiptDefaults     *V2PriorReceipt       `json:"receipt_defaults"`
+	ObservationDefaults V2ActivityObservation `json:"observation_defaults"`
+	Activities          []V2ActivityInput     `json:"activities"`
+	Indicators          V2MetricPair          `json:"indicators"`
+	Expected            V2Expected            `json:"expected"`
 }
 
 type V2Expected struct {
@@ -247,16 +247,16 @@ type V2Expected struct {
 }
 
 type V2Contract struct {
-	Schema          string                 `json:"schema"`
-	ID              string                 `json:"id"`
-	Version         string                 `json:"version"`
-	AppendOnlyFrom  string                 `json:"append_only_from"`
-	TargetActivities int                   `json:"target_activities"`
-	Precedence      []string               `json:"precedence"`
-	ProofTotals     map[string]int         `json:"proof_totals"`
-	IndicatorTotals map[string]int         `json:"indicator_totals"`
-	Activities      []V2ActivityDescriptor `json:"activities"`
-	Scenarios       []V2CaseSpec           `json:"scenarios"`
+	Schema           string                 `json:"schema"`
+	ID               string                 `json:"id"`
+	Version          string                 `json:"version"`
+	AppendOnlyFrom   string                 `json:"append_only_from"`
+	TargetActivities int                    `json:"target_activities"`
+	Precedence       []string               `json:"precedence"`
+	ProofTotals      map[string]int         `json:"proof_totals"`
+	IndicatorTotals  map[string]int         `json:"indicator_totals"`
+	Activities       []V2ActivityDescriptor `json:"activities"`
+	Scenarios        []V2CaseSpec           `json:"scenarios"`
 }
 
 type V2CaseSpec struct {
@@ -283,84 +283,84 @@ type V2ProjectedActivity struct {
 }
 
 type V2ActivityPlan struct {
-	ActivityID       string                `json:"activity_id"`
-	Activity         string                `json:"activity"`
-	ProofChoice      string                `json:"proof_choice"`
-	IndicatorClass   string                `json:"indicator_class"`
-	Action           string                `json:"action"`
-	AlreadyVerified  bool                  `json:"already_verified"`
-	RequiredRun      bool                  `json:"required_run"`
-	Executed         bool                  `json:"executed"`
-	ReusedClosed     bool                  `json:"reused_closed"`
-	SkippedWithProof bool                  `json:"skipped_with_proof"`
-	Unknown          bool                  `json:"unknown"`
-	Refuted          bool                  `json:"refuted"`
-	CacheHit         *bool                 `json:"cache_hit"`
-	CacheMiss        *bool                 `json:"cache_miss"`
-	DurationMS       *int64                `json:"duration_ms"`
-	PriorState       string                `json:"prior_state,omitempty"`
-	MissingFields    []string              `json:"missing_fields,omitempty"`
-	MismatchedFields []string              `json:"mismatched_fields,omitempty"`
-	Reason           string                `json:"reason"`
-	NextOperation    string                `json:"next_operation"`
+	ActivityID       string   `json:"activity_id"`
+	Activity         string   `json:"activity"`
+	ProofChoice      string   `json:"proof_choice"`
+	IndicatorClass   string   `json:"indicator_class"`
+	Action           string   `json:"action"`
+	AlreadyVerified  bool     `json:"already_verified"`
+	RequiredRun      bool     `json:"required_run"`
+	Executed         bool     `json:"executed"`
+	ReusedClosed     bool     `json:"reused_closed"`
+	SkippedWithProof bool     `json:"skipped_with_proof"`
+	Unknown          bool     `json:"unknown"`
+	Refuted          bool     `json:"refuted"`
+	CacheHit         *bool    `json:"cache_hit"`
+	CacheMiss        *bool    `json:"cache_miss"`
+	DurationMS       *int64   `json:"duration_ms"`
+	PriorState       string   `json:"prior_state,omitempty"`
+	MissingFields    []string `json:"missing_fields,omitempty"`
+	MismatchedFields []string `json:"mismatched_fields,omitempty"`
+	Reason           string   `json:"reason"`
+	NextOperation    string   `json:"next_operation"`
 }
 
 type V2IndicatorObservation struct {
-	Metric        string `json:"metric"`
-	Before        *int64 `json:"before"`
-	After         *int64 `json:"after"`
-	SignedDelta   *int64 `json:"signed_delta"`
-	Improvement   *int64 `json:"improvement"`
-	State         string `json:"state"`
-	SameIdentity  bool   `json:"same_identity"`
-	Reason        string `json:"reason"`
+	Metric       string `json:"metric"`
+	Before       *int64 `json:"before"`
+	After        *int64 `json:"after"`
+	SignedDelta  *int64 `json:"signed_delta"`
+	Improvement  *int64 `json:"improvement"`
+	State        string `json:"state"`
+	SameIdentity bool   `json:"same_identity"`
+	Reason       string `json:"reason"`
 }
 
 type V2DossierSummary struct {
-	TotalActivities int `json:"total_activities"`
-	RequiredRuns    int `json:"required_runs"`
-	ReusedClosed    int `json:"reused_closed"`
-	Unknown         int `json:"unknown"`
-	Refuted         int `json:"refuted"`
-	Executed        int `json:"executed"`
+	TotalActivities  int `json:"total_activities"`
+	RequiredRuns     int `json:"required_runs"`
+	ReusedClosed     int `json:"reused_closed"`
+	Unknown          int `json:"unknown"`
+	Refuted          int `json:"refuted"`
+	Executed         int `json:"executed"`
 	SkippedWithProof int `json:"skipped_with_proof"`
 }
 
 type V2ActionsReceipt struct {
-	Schema            string                    `json:"schema"`
-	RunID             string                    `json:"run_id"`
-	BuildMS           *int64                    `json:"build_ms"`
-	TestMS            *int64                    `json:"test_ms"`
-	WallMS            *int64                    `json:"wall_ms"`
-	PeakRSSKiB        *int64                    `json:"peak_rss_kib"`
-	CacheHits         *int64                    `json:"cache_hits"`
-	CacheMisses       *int64                    `json:"cache_misses"`
-	Activities        []V2ActivityObservation  `json:"activities"`
-	OperationalState  string                    `json:"operational_state"`
-	RepositoryWrites  int                       `json:"repository_writes"`
-	LocalTestExecutions int                     `json:"local_test_executions"`
-	CrossProjectRequiredGates int               `json:"cross_project_required_gates"`
+	Schema                    string                  `json:"schema"`
+	RunID                     string                  `json:"run_id"`
+	BuildMS                   *int64                  `json:"build_ms"`
+	TestMS                    *int64                  `json:"test_ms"`
+	WallMS                    *int64                  `json:"wall_ms"`
+	PeakRSSKiB                *int64                  `json:"peak_rss_kib"`
+	CacheHits                 *int64                  `json:"cache_hits"`
+	CacheMisses               *int64                  `json:"cache_misses"`
+	Activities                []V2ActivityObservation `json:"activities"`
+	OperationalState          string                  `json:"operational_state"`
+	RepositoryWrites          int                     `json:"repository_writes"`
+	LocalTestExecutions       int                     `json:"local_test_executions"`
+	CrossProjectRequiredGates int                     `json:"cross_project_required_gates"`
 }
 
 type V2Report struct {
-	Schema          string                    `json:"schema"`
-	CaseID          string                    `json:"case_id"`
-	Decision        string                    `json:"decision"`
-	Precedence      []string                  `json:"precedence"`
-	SemanticIR      V2SemanticIR              `json:"semantic_ir"`
-	SemanticChange  V2ChangeSet               `json:"semantic_change"`
-	ImpactNodes     []string                  `json:"impacted_nodes"`
-	ImpactEdges     []string                  `json:"impact_edges"`
-	Activities      []V2ActivityPlan          `json:"activities"`
-	Summary         V2DossierSummary          `json:"dossier_summary"`
-	Indicators      []V2IndicatorObservation  `json:"indicators"`
-	UnknownReasons  []string                  `json:"unknown_reasons,omitempty"`
-	RefutedReasons  []string                  `json:"refuted_reasons,omitempty"`
-	ContractDigest  string                    `json:"contract_digest"`
-	FixtureDigest   string                    `json:"fixture_digest"`
-	EvaluatorDigest string                    `json:"evaluator_digest"`
-	ActionsReceipt  *V2ActionsReceipt         `json:"actions_receipt,omitempty"`
-	Operational     V2Operational             `json:"operational"`
+	Schema          string                   `json:"schema"`
+	CaseID          string                   `json:"case_id"`
+	Decision        string                   `json:"decision"`
+	Precedence      []string                 `json:"precedence"`
+	SemanticIR      V2SemanticIR             `json:"semantic_ir"`
+	SemanticChange  V2ChangeSet              `json:"semantic_change"`
+	ImpactNodes     []string                 `json:"impacted_nodes"`
+	ImpactEdges     []string                 `json:"impact_edges"`
+	Activities      []V2ActivityPlan         `json:"activities"`
+	Summary         V2DossierSummary         `json:"dossier_summary"`
+	Indicators      []V2IndicatorObservation `json:"indicators"`
+	UnknownReasons  []string                 `json:"unknown_reasons,omitempty"`
+	RefutedReasons  []string                 `json:"refuted_reasons,omitempty"`
+	ContractDigest  string                   `json:"contract_digest"`
+	FixtureDigest   string                   `json:"fixture_digest"`
+	EvaluatorDigest string                   `json:"evaluator_digest"`
+	ActionsReceipt  *V2ActionsReceipt        `json:"actions_receipt,omitempty"`
+	Operational     V2Operational            `json:"operational"`
 }
 
 type V2Operational struct {
@@ -381,14 +381,14 @@ type V2CaseResult struct {
 }
 
 type V2SuiteReport struct {
-	Schema         string             `json:"schema"`
-	Decision       string             `json:"decision"`
-	Contract       string             `json:"contract"`
-	ContractDigest string             `json:"contract_digest"`
-	TotalActivities int               `json:"total_activities"`
-	Cases          []V2CaseResult     `json:"cases"`
-	ActionsReceipt *V2ActionsReceipt  `json:"actions_receipt,omitempty"`
-	ActionsMetricState string         `json:"actions_metric_state"`
-	MissingActionsMetrics []string    `json:"missing_actions_metrics,omitempty"`
-	Operational    V2Operational      `json:"operational"`
+	Schema                string            `json:"schema"`
+	Decision              string            `json:"decision"`
+	Contract              string            `json:"contract"`
+	ContractDigest        string            `json:"contract_digest"`
+	TotalActivities       int               `json:"total_activities"`
+	Cases                 []V2CaseResult    `json:"cases"`
+	ActionsReceipt        *V2ActionsReceipt `json:"actions_receipt,omitempty"`
+	ActionsMetricState    string            `json:"actions_metric_state"`
+	MissingActionsMetrics []string          `json:"missing_actions_metrics,omitempty"`
+	Operational           V2Operational     `json:"operational"`
 }
