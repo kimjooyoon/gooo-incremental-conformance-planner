@@ -27,6 +27,7 @@ jobs:
       - name: Check Go formatting
         shell: bash
         run: |
+          # shellcheck disable=SC2016
           set -Eeuo pipefail
           files=$(gofmt -l .)
           if [[ -n "$files" ]]; then
@@ -71,6 +72,7 @@ jobs:
       - name: Build immutable evidence asset
         shell: bash
         run: |
+          # shellcheck disable=SC2016
           set -Eeuo pipefail
           asset="$RUNNER_TEMP/gooo-incremental-conformance-planner-${RELEASE_TAG}-evidence.tar.gz"
           tar -czf "$asset" -C "$RUNNER_TEMP/gooo-incremental-conformance-planner-main" .
@@ -82,6 +84,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # shellcheck disable=SC2016
           set -Eeuo pipefail
           if git ls-remote --exit-code --refs origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
             echo "refusing to overwrite existing tag $RELEASE_TAG" >&2
@@ -107,6 +110,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # shellcheck disable=SC2016
           set -Eeuo pipefail
           release_json="$RUNNER_TEMP/release.json"
           gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$release_json"
@@ -134,6 +138,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          # shellcheck disable=SC2016
           set -Eeuo pipefail
           gh release edit "$RELEASE_TAG" --draft=false
           gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" | jq -e '.draft == false' >/dev/null
