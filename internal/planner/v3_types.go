@@ -173,6 +173,7 @@ func (identity V3PriorRunIdentity) Missing() []string {
 }
 
 type V3Observation struct {
+	ActivityID string `json:"activity_id,omitempty"`
 	Status     string `json:"status"`
 	BuildMS    *int64 `json:"build_ms"`
 	TestMS     *int64 `json:"test_ms"`
