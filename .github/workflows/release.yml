@@ -76,7 +76,7 @@ jobs:
           set -Eeuo pipefail
           asset="$RUNNER_TEMP/gooo-incremental-conformance-planner-${RELEASE_TAG}-evidence.tar.gz"
           tar -czf "$asset" -C "$RUNNER_TEMP/gooo-incremental-conformance-planner-main" .
-          digest=$(sha256sum "$asset" | awk '{print $1}')
+          digest=$(sha256sum "$asset" | cut -d' ' -f1)
           printf 'asset=%s\ndigest=sha256:%s\n' "$asset" "$digest" > "$RUNNER_TEMP/release-asset.txt"
 
       - name: Create annotated tag and draft release once
@@ -100,8 +100,8 @@ jobs:
           git push origin "$RELEASE_TAG"
           tag_target=$(git rev-parse "$RELEASE_TAG^{}")
           test "$tag_target" = "$GITHUB_SHA"
-          asset=$(awk -F= '$1 == "asset" {print $2}' "$RUNNER_TEMP/release-asset.txt")
-          digest=$(awk -F= '$1 == "digest" {print $2}' "$RUNNER_TEMP/release-asset.txt")
+          asset=$(grep '^asset=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
+          digest=$(grep '^digest=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
           printf '# %s\n\nEvidence asset digest: `%s`\n\nThe release is published only after draft verification.\n' "$RELEASE_TAG" "$digest" > "$RUNNER_TEMP/release-notes.md"
           gh release create "$RELEASE_TAG" "$asset" --draft --title "Gooo incremental conformance planner $RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md" --verify-tag
 
@@ -122,14 +122,14 @@ jobs:
           tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_object")
           jq -e --arg sha "$GITHUB_SHA" '.object.sha == $sha and .object.type == "commit"' <<<"$tag_json" >/dev/null
           asset_id=$(jq -r '.assets[0].id' "$release_json")
-          asset=$(awk -F= '$1 == "asset" {print $2}' "$RUNNER_TEMP/release-asset.txt")
-          expected=$(awk -F= '$1 == "digest" {print $2}' "$RUNNER_TEMP/release-asset.txt")
+          asset=$(grep '^asset=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
+          expected=$(grep '^digest=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
           server_digest=$(jq -r '.assets[0].digest // empty' "$release_json")
           if [[ -n "$server_digest" ]]; then
             test "$server_digest" = "$expected"
           fi
           gh api --header 'Accept: application/octet-stream' "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id" > "$RUNNER_TEMP/downloaded-evidence.tar.gz"
-          downloaded="sha256:$(sha256sum "$RUNNER_TEMP/downloaded-evidence.tar.gz" | awk '{print $1}')"
+          downloaded="sha256:$(sha256sum "$RUNNER_TEMP/downloaded-evidence.tar.gz" | cut -d' ' -f1)"
           test "$downloaded" = "$expected"
           jq -n --arg tag "$RELEASE_TAG" --arg commit "$GITHUB_SHA" --arg asset "$asset" --arg expected "$expected" --arg downloaded "$downloaded" --argjson asset_id "$asset_id" '{tag:$tag, commit_sha:$commit, asset:$asset, asset_id:$asset_id, expected_digest:$expected, downloaded_digest:$downloaded, draft_verified:true}' > "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/release-verification.json"
 
