@@ -57,11 +57,13 @@ func Run(options RunOptions) (Report, error) {
 }
 
 func Plan(meta Meta, fixture Fixture, contractDigest string) (Report, error) {
-	if err := validateFixture(fixture); err != nil {
+	if err := validateFixture(meta, fixture); err != nil {
 		return Report{}, err
 	}
 	graphImpact, graphRefutations := computeImpact(fixture.Before, fixture.After)
+	fixedPoint, fixedPointRefutations := evaluateFixedPoint(meta, fixture)
 	refutations := append([]Evidence(nil), graphRefutations...)
+	refutations = append(refutations, fixedPointRefutations...)
 	units := sortedUnits(fixture.Units)
 	plans := make([]UnitPlan, 0, len(units))
 	unknowns := []Evidence{}
@@ -71,7 +73,7 @@ func Plan(meta Meta, fixture Fixture, contractDigest string) (Report, error) {
 		if plan.Unknown {
 			unknowns = append(unknowns, Evidence{
 				Stage: "PLAN_VALIDATION_UNIT", Step: "BIND_CACHE_IDENTITY",
-				Reason: plan.Reason, Next: plan.Next, BlockedBy: []string{unit.ID},
+				Class: fixture.UnknownClass, Reason: plan.Reason, Next: plan.Next, BlockedBy: []string{unit.ID},
 			})
 		}
 		if plan.Refuted {
@@ -86,7 +88,7 @@ func Plan(meta Meta, fixture Fixture, contractDigest string) (Report, error) {
 		if indicator.State == IndicatorUnknown {
 			unknowns = append(unknowns, Evidence{
 				Stage: "OBSERVE_MATCHED_IDENTITY", Step: "COMPARE_BEFORE_AFTER",
-				Reason: indicator.Reason, Next: "MEASURE_BEFORE_AND_AFTER_WITH_THE_SAME_IDENTITY",
+				Class: fixture.UnknownClass, Reason: indicator.Reason, Next: "MEASURE_BEFORE_AND_AFTER_WITH_THE_SAME_IDENTITY",
 				BlockedBy: []string{indicator.Metric},
 			})
 		}
@@ -97,6 +99,7 @@ func Plan(meta Meta, fixture Fixture, contractDigest string) (Report, error) {
 	} else if len(unknowns) > 0 {
 		decision = DecisionUnknown
 	}
+	fixedPoint = finalizeFixedPoint(fixedPoint, decision)
 	optional, err := consumeOptionalSlicer(meta.OptionalInput, fixture.OptionalSlicer)
 	if err != nil {
 		return Report{}, err
@@ -110,14 +113,14 @@ func Plan(meta Meta, fixture Fixture, contractDigest string) (Report, error) {
 	return Report{
 		Schema: "gooo/incremental-conformance-planner/report/v1",
 		CaseID: fixture.CaseID, Decision: decision, Precedence: append([]string(nil), Precedence...),
-		Impact: graphImpact, Units: plans, Indicators: indicators,
+		Impact: graphImpact, Units: plans, Indicators: indicators, UnknownClass: fixture.UnknownClass, FixedPoint: fixedPoint,
 		Unknowns: unknowns, Refutations: refutations, OptionalSlicer: optional,
 		Operational: operational, SourceDigest: DigestBytes([]byte(fixture.CaseID)),
 		ContractDigest: contractDigest, MetaDigest: meta.SourceDigest,
 	}, nil
 }
 
-func validateFixture(fixture Fixture) error {
+func validateFixture(meta Meta, fixture Fixture) error {
 	if fixture.Schema != "gooo/incremental-conformance-planner/fixture/v1" || fixture.CaseID == "" {
 		return errors.New("fixture must use the incremental planner fixture schema and a case_id")
 	}
@@ -126,6 +129,22 @@ func validateFixture(fixture Fixture) error {
 	}
 	if len(fixture.Units) == 0 {
 		return fmt.Errorf("fixture %s has no validation units", fixture.CaseID)
+	}
+	if fixture.Expected.Decision != fixture.Kind {
+		return fmt.Errorf("fixture %s expected decision must match kind", fixture.CaseID)
+	}
+	if fixture.Kind == DecisionUnknown {
+		if !contains(meta.UnknownClasses, fixture.UnknownClass) {
+			return fmt.Errorf("fixture %s must declare a .gooo-owned UNKNOWN class", fixture.CaseID)
+		}
+		if fixture.Expected.UnknownClass != fixture.UnknownClass {
+			return fmt.Errorf("fixture %s expected UNKNOWN class must match fixture class", fixture.CaseID)
+		}
+	} else if fixture.UnknownClass != "" || fixture.Expected.UnknownClass != "" {
+		return fmt.Errorf("fixture %s may declare unknown_class only for UNKNOWN cases", fixture.CaseID)
+	}
+	if _, ok := fixedPointCaseMode(meta, fixture.CaseID); !ok && fixture.FixedPoint != nil {
+		return fmt.Errorf("fixture %s has an unauthorized fixed-point declaration", fixture.CaseID)
 	}
 	seen := map[string]bool{}
 	for _, unit := range fixture.Units {
@@ -138,6 +157,127 @@ func validateFixture(fixture Fixture) error {
 		}
 	}
 	return nil
+}
+
+func fixedPointCaseMode(meta Meta, caseID string) (string, bool) {
+	for _, item := range meta.FixedPointCases {
+		if item.ID == caseID {
+			return item.Mode, true
+		}
+	}
+	return "", false
+}
+
+func evaluateFixedPoint(meta Meta, fixture Fixture) (FixedPointAssessment, []Evidence) {
+	mode, authorized := fixedPointCaseMode(meta, fixture.CaseID)
+	assessment := FixedPointAssessment{
+		State: FixedPointNotApplicable, Declared: fixture.FixedPoint != nil && fixture.FixedPoint.Declared,
+		CaseMode: mode, Rule: "FIXED_POINT_ONLY_IF_EXPLICIT", Reason: "NO_FIXED_POINT_CASE_DECLARED_BY_GOOO_AUTHORITY",
+	}
+	if !contains(meta.FixedPointRules, "FIXED_POINT_ONLY_IF_EXPLICIT") {
+		return malformedFixedPointAssessment(assessment, "UNDECLARED_FIXED_POINT_RULE"), []Evidence{{
+			Stage: "PARSE_GOOO", Step: "VALIDATE_FIXED_POINT_RULE",
+			Reason: "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE", Next: "RELEASE_CORRECTED_GOOO_AUTHORITY",
+			BlockedBy: []string{"FIXED_POINT_ONLY_IF_EXPLICIT"},
+		}}
+	}
+	if !authorized {
+		if fixture.FixedPoint == nil {
+			return assessment, nil
+		}
+		return malformedFixedPointAssessment(assessment, "FIXED_POINT_CASE_NOT_AUTHORIZED_BY_GOOO"), []Evidence{{
+			Stage: "INSPECT_PROOF_STATE", Step: "VALIDATE_FIXED_POINT_DECLARATION",
+			Reason: "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE", Next: "RELEASE_CORRECTED_EXPLICIT_FIXED_POINT_CASE",
+			BlockedBy: []string{fixture.CaseID},
+		}}
+	}
+	assessment.Rule = modeRule(meta, mode)
+	if assessment.Rule == "" {
+		return malformedFixedPointAssessment(assessment, "UNDECLARED_FIXED_POINT_RULE"), []Evidence{{
+			Stage: "PARSE_GOOO", Step: "VALIDATE_FIXED_POINT_RULE",
+			Reason: "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE", Next: "RELEASE_CORRECTED_GOOO_AUTHORITY",
+			BlockedBy: []string{mode},
+		}}
+	}
+	switch mode {
+	case "EXPLICIT_FIXED_POINT", "FAIL_CLOSED_UNKNOWN":
+		if fixture.FixedPoint == nil || !fixture.FixedPoint.Declared || fixture.FixedPoint.Kind != FixedPointExplicitKind || fixture.FixedPoint.Witness == "" {
+			return malformedFixedPointAssessment(assessment, "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE"), []Evidence{{
+				Stage: "INSPECT_PROOF_STATE", Step: "VALIDATE_FIXED_POINT_DECLARATION",
+				Reason: "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE", Next: "RELEASE_CORRECTED_EXPLICIT_FIXED_POINT_CASE",
+				BlockedBy: []string{fixture.CaseID},
+			}}
+		}
+		assessment.Declared = true
+		assessment.Reason = "EXPLICIT_FIXED_POINT_DECLARATION_ACCEPTED_FOR_EVALUATION"
+		return assessment, nil
+	case "MALFORMED_OR_IMPLICIT_COUNTEREXAMPLE":
+		if fixture.FixedPoint == nil || (fixture.FixedPoint.Declared && fixture.FixedPoint.Kind == FixedPointExplicitKind) || (fixture.FixedPoint.Kind != FixedPointImplicitKind && fixture.FixedPoint.Kind != FixedPointMalformedKind) {
+			return malformedFixedPointAssessment(assessment, "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE"), []Evidence{{
+				Stage: "INSPECT_PROOF_STATE", Step: "VALIDATE_FIXED_POINT_DECLARATION",
+				Reason: "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE", Next: "RELEASE_CORRECTED_EXPLICIT_FIXED_POINT_CASE",
+				BlockedBy: []string{fixture.CaseID},
+			}}
+		}
+		assessment.Declared = fixture.FixedPoint.Declared
+		assessment.State = FixedPointRefuted
+		assessment.Reason = "MALFORMED_OR_IMPLICIT_FIXED_POINT_IS_REFUTED"
+		return assessment, []Evidence{{
+			Stage: "INSPECT_PROOF_STATE", Step: "PRESERVE_FIXED_POINT_COUNTEREXAMPLE",
+			Reason: "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE", Next: "RELEASE_CORRECTED_EXPLICIT_FIXED_POINT_CASE",
+			BlockedBy: []string{fixture.CaseID},
+		}}
+	default:
+		return malformedFixedPointAssessment(assessment, "UNKNOWN_FIXED_POINT_CASE_MODE"), []Evidence{{
+			Stage: "INSPECT_PROOF_STATE", Step: "VALIDATE_FIXED_POINT_DECLARATION",
+			Reason: "MALFORMED_OR_IMPLICIT_FIXED_POINT_COUNTEREXAMPLE", Next: "RELEASE_CORRECTED_EXPLICIT_FIXED_POINT_CASE",
+			BlockedBy: []string{fixture.CaseID},
+		}}
+	}
+}
+
+func malformedFixedPointAssessment(assessment FixedPointAssessment, reason string) FixedPointAssessment {
+	assessment.State = FixedPointRefuted
+	assessment.Reason = reason
+	return assessment
+}
+
+func modeRule(meta Meta, mode string) string {
+	rule := "FIXED_POINT_ONLY_IF_EXPLICIT"
+	switch mode {
+	case "FAIL_CLOSED_UNKNOWN":
+		rule = "UNKNOWN_TOP_DECISION_FAIL_CLOSED"
+	case "MALFORMED_OR_IMPLICIT_COUNTEREXAMPLE":
+		rule = "MALFORMED_OR_IMPLICIT_FIXED_POINT_REFUTED"
+	}
+	if contains(meta.FixedPointRules, rule) {
+		return rule
+	}
+	return ""
+}
+
+func finalizeFixedPoint(assessment FixedPointAssessment, decision string) FixedPointAssessment {
+	if assessment.State == FixedPointRefuted || assessment.CaseMode == "" {
+		return assessment
+	}
+	if decision == DecisionUnknown {
+		assessment.State = FixedPointUnknown
+		assessment.Reason = "UNKNOWN_TOP_DECISION_IS_NOT_FIXED_POINT; FAIL_CLOSED_UNKNOWN"
+		return assessment
+	}
+	if decision == DecisionRefuted {
+		assessment.State = FixedPointRefuted
+		assessment.Reason = "REFUTED_TOP_DECISION_IS_NOT_FIXED_POINT"
+		return assessment
+	}
+	if assessment.CaseMode == "EXPLICIT_FIXED_POINT" {
+		assessment.State = FixedPointState
+		assessment.Reason = "EXPLICIT_FIXED_POINT_DECLARATION_ACCEPTED"
+		return assessment
+	}
+	assessment.State = FixedPointNotApplicable
+	assessment.Reason = "FIXED_POINT_ONLY_IF_EXPLICIT; TOP_DECISION_NOT_AN_EXPLICIT_FIXED_POINT_CASE"
+	return assessment
 }
 
 func validateDenominator(denominator Denominator) error {
@@ -482,6 +622,22 @@ func RunSuite(options SuiteOptions) (SuiteReport, error) {
 			return SuiteReport{}, err
 		}
 		match := report.Decision == item.Expected && fixture.Expected.Decision == item.Expected
+		if match && report.UnknownClass != fixture.Expected.UnknownClass {
+			match = false
+		}
+		if match {
+			mode, authorized := fixedPointCaseMode(meta, fixture.CaseID)
+			if authorized {
+				switch mode {
+				case "EXPLICIT_FIXED_POINT":
+					match = report.FixedPoint.State == FixedPointState && report.Decision == DecisionClosed
+				case "FAIL_CLOSED_UNKNOWN":
+					match = report.FixedPoint.State == FixedPointUnknown && report.Decision == DecisionUnknown
+				case "MALFORMED_OR_IMPLICIT_COUNTEREXAMPLE":
+					match = report.FixedPoint.State == FixedPointRefuted && report.Decision == DecisionRefuted
+				}
+			}
+		}
 		if match {
 			byID := map[string]string{}
 			for _, unit := range report.Units {

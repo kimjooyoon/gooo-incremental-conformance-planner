@@ -11,6 +11,7 @@ func RenderReport(report Report) string {
 	fmt.Fprintf(&b, "Precedence: `%s`\n\n", strings.Join(report.Precedence, " > "))
 	b.WriteString("## Semantic impact\n\n")
 	fmt.Fprintf(&b, "Changed nodes: `%s`  \nImpacted nodes: `%s`  \nCausal edges: `%s`\n\n", joinOrNone(report.Impact.ChangedNodes), joinOrNone(report.Impact.ImpactedNodes), joinOrNone(report.Impact.Edges))
+	fmt.Fprintf(&b, "Fixed-point assessment: state=`%s`, declared=%t, case_mode=`%s`, rule=`%s`; %s\n\n", report.FixedPoint.State, report.FixedPoint.Declared, report.FixedPoint.CaseMode, report.FixedPoint.Rule, report.FixedPoint.Reason)
 	b.WriteString("## Per-unit execution plan\n\n")
 	b.WriteString("| Unit | Planned | Action | Executed | Reused | Unknown | Refuted | build_ms | test_ms | wall_ms | peak_rss_kib | Reason |\n|---|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---|\n")
 	for _, unit := range report.Units {
@@ -26,7 +27,7 @@ func RenderReport(report Report) string {
 	if len(report.Unknowns) > 0 {
 		b.WriteString("## UNKNOWN evidence\n\n")
 		for _, item := range report.Unknowns {
-			fmt.Fprintf(&b, "- `%s/%s`: %s; next `%s`; blocked by `%s`\n", item.Stage, item.Step, item.Reason, item.Next, joinOrNone(item.BlockedBy))
+			fmt.Fprintf(&b, "- `%s/%s`: class=`%s`; %s; next `%s`; blocked by `%s`\n", item.Stage, item.Step, item.Class, item.Reason, item.Next, joinOrNone(item.BlockedBy))
 		}
 		b.WriteString("\n")
 	}

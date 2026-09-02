@@ -14,7 +14,7 @@ func ParseMeta(path string) (Meta, error) {
 	}
 	meta := Meta{
 		Schema:     path,
-		Precedence: []string{}, Authorities: []string{}, ReuseRules: []string{},
+		Precedence: []string{}, Authorities: []string{}, ReuseRules: []string{}, UnknownClasses: []string{}, FixedPointRules: []string{}, FixedPointCases: []FixedPointCase{},
 		Activities: []string{}, ProofCells: []Cell{}, IndicatorCells: []Cell{},
 		ForbiddenEffects: []string{}, SourcePath: path, SourceDigest: DigestBytes(data),
 	}
@@ -41,6 +41,18 @@ func ParseMeta(path string) (Meta, error) {
 			meta.Precedence = strings.Fields(strings.ReplaceAll(strings.Join(fields[1:], " "), ">", " "))
 		case "authority":
 			meta.Authorities = append(meta.Authorities, fields[1])
+		case "unknown_class":
+			if len(fields) < 3 || fields[1] != "enum" {
+				return Meta{}, fmt.Errorf("line %d: unknown_class requires enum values", lineNumber)
+			}
+			meta.UnknownClasses = append(meta.UnknownClasses, fields[2:]...)
+		case "fixed_point_rule":
+			meta.FixedPointRules = append(meta.FixedPointRules, strings.Join(fields[1:], " "))
+		case "fixed_point_case":
+			if len(fields) != 3 {
+				return Meta{}, fmt.Errorf("line %d: fixed_point_case requires case id and mode", lineNumber)
+			}
+			meta.FixedPointCases = append(meta.FixedPointCases, FixedPointCase{ID: fields[1], Mode: fields[2]})
 		case "validation_unit":
 			meta.ValidationUnit = strings.Join(fields[1:], " ")
 		case "semantic_dependency":
@@ -118,6 +130,34 @@ func validateMeta(meta Meta) error {
 	if meta.ValidationUnit == "" || meta.Dependency == "" || meta.CacheIdentity == "" || meta.ExecutionPlan == "" {
 		return fmt.Errorf(".gooo is missing one or more authority schemas")
 	}
+	if len(meta.UnknownClasses) != len(RequiredUnknownClasses) {
+		return fmt.Errorf(".gooo must declare exactly %d UNKNOWN classes", len(RequiredUnknownClasses))
+	}
+	for _, required := range RequiredUnknownClasses {
+		if !contains(meta.UnknownClasses, required) {
+			return fmt.Errorf(".gooo is missing UNKNOWN class %q", required)
+		}
+	}
+	if len(meta.FixedPointRules) != len(RequiredFixedPointRules) {
+		return fmt.Errorf(".gooo must declare exactly %d fixed-point rules", len(RequiredFixedPointRules))
+	}
+	for _, required := range RequiredFixedPointRules {
+		if !contains(meta.FixedPointRules, required) {
+			return fmt.Errorf(".gooo is missing fixed-point rule %q", required)
+		}
+	}
+	if len(meta.FixedPointCases) != 3 {
+		return fmt.Errorf(".gooo must own exactly 3 fixed-point cases")
+	}
+	for _, required := range []FixedPointCase{
+		{ID: "exact-cache-hit", Mode: "EXPLICIT_FIXED_POINT"},
+		{ID: "unmatched-before-after", Mode: "FAIL_CLOSED_UNKNOWN"},
+		{ID: "known-counterexample", Mode: "MALFORMED_OR_IMPLICIT_COUNTEREXAMPLE"},
+	} {
+		if !hasFixedPointCase(meta.FixedPointCases, required) {
+			return fmt.Errorf(".gooo is missing fixed-point case %q/%q", required.ID, required.Mode)
+		}
+	}
 	if len(meta.Activities) != len(RequiredActivities) {
 		return fmt.Errorf(".gooo must define exactly %d meta activities", len(RequiredActivities))
 	}
@@ -139,6 +179,15 @@ func validateMeta(meta Meta) error {
 		return fmt.Errorf("optional slicer input must be digest-pinned v0.1.1, non-required, non-gating, and non-copied")
 	}
 	return nil
+}
+
+func hasFixedPointCase(cases []FixedPointCase, wanted FixedPointCase) bool {
+	for _, item := range cases {
+		if item.ID == wanted.ID && item.Mode == wanted.Mode {
+			return true
+		}
+	}
+	return false
 }
 
 func contains(values []string, wanted string) bool {
