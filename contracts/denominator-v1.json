@@ -12,7 +12,7 @@
     {"id": "semantic-impact-propagation", "source": "fixtures/cases/semantic-impact-propagation.json", "expected": "CLOSED", "kind": "proof"},
     {"id": "unrelated-change", "source": "fixtures/cases/unrelated-change.json", "expected": "CLOSED", "kind": "proof"},
     {"id": "exact-cache-hit-with-optional-slicer", "source": "fixtures/cases/exact-cache-hit-with-optional-slicer.json", "expected": "CLOSED", "kind": "proof"},
-    {"id": "stale-toolchain", "source": "fixtures/cases/stale-toolchain.json", "expected": "CLOSED", "kind": "proof"},
+    {"id": "stale-toolchain", "source": "fixtures/cases/stale-toolchain.json", "expected": "UNKNOWN", "kind": "proof"},
     {"id": "missing-fixture-digest", "source": "fixtures/cases/missing-fixture-digest.json", "expected": "UNKNOWN", "kind": "proof"},
     {"id": "missing-cache-receipt", "source": "fixtures/cases/missing-cache-receipt.json", "expected": "UNKNOWN", "kind": "proof"},
     {"id": "unmatched-before-after", "source": "fixtures/cases/unmatched-before-after.json", "expected": "UNKNOWN", "kind": "proof"},
