@@ -84,51 +84,70 @@ jobs:
           digest=$(sha256sum "$asset" | cut -d' ' -f1)
           printf 'asset=%s\ndigest=sha256:%s\n' "$asset" "$digest" > "$RUNNER_TEMP/release-asset.txt"
 
-      - name: Create annotated tag and draft release once
+      - name: Create or recover annotated tag and draft release
         shell: bash
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           # shellcheck disable=SC2016
           set -Eeuo pipefail
-          if git ls-remote --exit-code --refs origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
-            echo "refusing to overwrite existing tag $RELEASE_TAG" >&2
-            exit 1
-          fi
-          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
-            echo "refusing to overwrite existing release $RELEASE_TAG" >&2
-            exit 1
-          fi
-          git config user.name github-actions[bot]
-          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git tag -a "$RELEASE_TAG" "$GITHUB_SHA" -m "gooo incremental conformance planner $RELEASE_TAG"
-          git push origin "$RELEASE_TAG"
-          tag_target=$(git rev-parse "$RELEASE_TAG^{}")
-          test "$tag_target" = "$GITHUB_SHA"
           asset=$(grep '^asset=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
           digest=$(grep '^digest=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
-          printf '# %s\n\nEvidence asset digest: `%s`\n\nThe release is published only after draft verification.\n' "$RELEASE_TAG" "$digest" > "$RUNNER_TEMP/release-notes.md"
-          release_json=$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases" \
-            -f tag_name="$RELEASE_TAG" \
-            -f name="Gooo incremental conformance planner $RELEASE_TAG" \
-            -f body="$(<"$RUNNER_TEMP/release-notes.md")" \
-            -F draft=true \
-            -F prerelease=false)
-          release_id=$(printf '%s' "$release_json" | jq -r '.id')
-          test "$release_id" != "null"
           asset_name=$(basename "$asset")
-          upload_json=$(gh api --method POST --hostname uploads.github.com \
-            --header 'Accept: application/vnd.github+json' \
-            --header 'Content-Type: application/gzip' \
-            --input "$asset" \
-            "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?name=$asset_name")
-          jq -e --arg name "$asset_name" '.name == $name and .state == "uploaded"' <<<"$upload_json" >/dev/null
-          asset_id=$(printf '%s' "$upload_json" | jq -r '.id')
-          server_digest=$(printf '%s' "$upload_json" | jq -r '.digest // empty')
+          printf '# %s\n\nEvidence asset digest: `%s`\n\nThe release is published only after draft verification.\n' "$RELEASE_TAG" "$digest" > "$RUNNER_TEMP/release-notes.md"
+          if git ls-remote --exit-code --refs origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
+            tag_ref=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG")
+            tag_object=$(printf '%s' "$tag_ref" | jq -r '.object.sha')
+            tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_object")
+            jq -e --arg sha "$GITHUB_SHA" '.object.sha == $sha and .object.type == "commit"' <<<"$tag_json" >/dev/null
+            tag_mode=recovered
+          else
+            git config user.name github-actions[bot]
+            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+            git tag -a "$RELEASE_TAG" "$GITHUB_SHA" -m "gooo incremental conformance planner $RELEASE_TAG"
+            git push origin "$RELEASE_TAG"
+            tag_mode=created
+          fi
+
+          release_list=$(gh api "repos/$GITHUB_REPOSITORY/releases?per_page=100")
+          release_matches=$(printf '%s' "$release_list" | jq --arg tag "$RELEASE_TAG" '[.[] | select(.tag_name == $tag)]')
+          release_count=$(printf '%s' "$release_matches" | jq 'length')
+          if [[ "$release_count" == 1 ]]; then
+            release_id=$(printf '%s' "$release_matches" | jq -r '.[0].id')
+            release_mode=recovered
+            release_json=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id")
+            jq -e --arg tag "$RELEASE_TAG" '.tag_name == $tag and .draft == true and .prerelease == false' <<<"$release_json" >/dev/null
+          elif [[ "$release_count" == 0 ]]; then
+            release_json=$(gh api --method POST "repos/$GITHUB_REPOSITORY/releases" \
+              -f tag_name="$RELEASE_TAG" \
+              -f name="Gooo incremental conformance planner $RELEASE_TAG" \
+              -f body="$(<"$RUNNER_TEMP/release-notes.md")" \
+              -F draft=true \
+              -F prerelease=false)
+            release_id=$(printf '%s' "$release_json" | jq -r '.id')
+            test "$release_id" != "null"
+            release_mode=created
+          else
+            echo "multiple releases found for $RELEASE_TAG" >&2
+            exit 1
+          fi
+
+          assets_json=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100")
+          asset_count=$(printf '%s' "$assets_json" | jq 'length')
+          if [[ "$asset_count" == 0 ]]; then
+            gh release upload "$RELEASE_TAG" "$asset" --repo "$GITHUB_REPOSITORY"
+          elif [[ "$asset_count" != 1 ]]; then
+            echo "refusing to mutate release $RELEASE_TAG with $asset_count existing assets" >&2
+            exit 1
+          fi
+          assets_json=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id/assets?per_page=100")
+          jq -e --arg name "$asset_name" 'length == 1 and .[0].name == $name and .[0].state == "uploaded"' <<<"$assets_json" >/dev/null
+          asset_id=$(printf '%s' "$assets_json" | jq -r '.[0].id')
+          server_digest=$(printf '%s' "$assets_json" | jq -r '.[0].digest // empty')
           if [[ -n "$server_digest" ]]; then
             test "$digest" = "$server_digest"
           fi
-          printf 'release_id=%s\nasset_id=%s\nasset_name=%s\ndigest=%s\ncommit=%s\nmode=created\n' "$release_id" "$asset_id" "$asset_name" "$digest" "$GITHUB_SHA" > "$RUNNER_TEMP/release-asset.txt"
+          printf 'release_id=%s\nasset_id=%s\nasset_name=%s\ndigest=%s\ncommit=%s\ntag_mode=%s\nrelease_mode=%s\n' "$release_id" "$asset_id" "$asset_name" "$digest" "$GITHUB_SHA" "$tag_mode" "$release_mode" > "$RUNNER_TEMP/release-asset.txt"
 
       - name: Verify draft tag and asset digest
         shell: bash
