@@ -96,14 +96,13 @@ jobs:
             tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_object")
             tag_target=$(printf '%s' "$tag_json" | jq -r '.object.sha')
             jq -e '.object.type == "commit"' <<<"$tag_json" >/dev/null
-            release_json=$(gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" | jq -s --arg tag "$RELEASE_TAG" '
-              add | map(select(.tag_name == $tag)) | if length == 1 then .[0] else error("expected exactly one existing release") end
-            ')
+            release_id=$(jq -r '.next_release.release_id' .github/immutable-release-policy.json)
+            release_json=$(gh api "repos/$GITHUB_REPOSITORY/releases/$release_id")
             jq -e '.draft == true and (.assets | length == 1)' <<<"$release_json" >/dev/null
             asset_name=$(printf '%s' "$release_json" | jq -r '.assets[0].name')
             digest=$(printf '%s' "$release_json" | jq -r '(.assets[0].digest // "") as $digest | if $digest != "" then $digest else (try (.body | capture("Evidence asset digest: `(?<digest>sha256:[0-9a-f]+)`").digest) catch "") end')
             test -n "$digest"
-            printf 'asset_name=%s\ndigest=%s\ncommit=%s\nmode=recovery\n' "$asset_name" "$digest" "$tag_target" > "$RUNNER_TEMP/release-asset.txt"
+            printf 'release_id=%s\nasset_name=%s\ndigest=%s\ncommit=%s\nmode=recovery\n' "$release_id" "$asset_name" "$digest" "$tag_target" > "$RUNNER_TEMP/release-asset.txt"
             echo "preserving existing immutable tag and draft release $RELEASE_TAG"
             exit 0
           fi
@@ -131,9 +130,8 @@ jobs:
           # shellcheck disable=SC2016
           set -Eeuo pipefail
           release_json="$RUNNER_TEMP/release.json"
-          gh api --paginate "repos/$GITHUB_REPOSITORY/releases?per_page=100" | jq -s --arg tag "$RELEASE_TAG" '
-            add | map(select(.tag_name == $tag)) | if length == 1 then .[0] else error("expected exactly one release") end
-          ' > "$release_json"
+          release_id=$(grep '^release_id=' "$RUNNER_TEMP/release-asset.txt" | cut -d= -f2-)
+          gh api "repos/$GITHUB_REPOSITORY/releases/$release_id" > "$release_json"
           jq -e --arg tag "$RELEASE_TAG" '
             .tag_name == $tag and .draft == true and (.assets | length == 1)
           ' "$release_json" >/dev/null
@@ -152,7 +150,7 @@ jobs:
           gh api --header 'Accept: application/octet-stream' "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id" > "$RUNNER_TEMP/downloaded-evidence.tar.gz"
           downloaded="sha256:$(sha256sum "$RUNNER_TEMP/downloaded-evidence.tar.gz" | cut -d' ' -f1)"
           test "$downloaded" = "$expected"
-          jq -n --arg tag "$RELEASE_TAG" --arg commit "$expected_commit" --arg asset "$asset" --arg expected "$expected" --arg downloaded "$downloaded" --argjson asset_id "$asset_id" '{tag:$tag, commit_sha:$commit, asset:$asset, asset_id:$asset_id, expected_digest:$expected, downloaded_digest:$downloaded, draft_verified:true}' > "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/release-verification.json"
+          jq -n --arg tag "$RELEASE_TAG" --arg commit "$expected_commit" --arg asset "$asset" --arg expected "$expected" --arg downloaded "$downloaded" --argjson release_id "$release_id" --argjson asset_id "$asset_id" '{tag:$tag, release_id:$release_id, commit_sha:$commit, asset:$asset, asset_id:$asset_id, expected_digest:$expected, downloaded_digest:$downloaded, draft_verified:true}' > "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/release-verification.json"
 
       - name: Publish verified draft without rewriting it
         shell: bash
