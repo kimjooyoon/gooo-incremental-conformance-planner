@@ -18,7 +18,7 @@ const (
 	V3IndicatorOutcome   = "OUTCOME"
 	V3IndicatorGuardrail = "GUARDRAIL"
 
-	V3UnknownMissingIdentity    = "MISSING_IDENTITY"
+	V3UnknownMissingIdentity   = "MISSING_IDENTITY"
 	V3UnknownMissingProvenance = "MISSING_PROVENANCE"
 	V3UnknownMissingReceipt    = "MISSING_IMMUTABLE_RECEIPT"
 	V3UnknownMissingMetrics    = "MISSING_ACTIONS_METRIC"
@@ -79,23 +79,23 @@ var V3Policies = []string{
 }
 
 type V3Source struct {
-	Schema           string
-	Program          string
-	Namespace        string
-	Precedence       []string
-	Authorities      []string
-	IdentityFields   []string
-	PriorRunFields   []string
+	Schema            string
+	Program           string
+	Namespace         string
+	Precedence        []string
+	Authorities       []string
+	IdentityFields    []string
+	PriorRunFields    []string
 	ObservationFields []string
-	UnknownFields    []string
-	UnknownClasses   []string
-	Policies         []string
-	ToolchainDigest  string
-	ProofChoices     []string
-	IndicatorClasses []string
-	FixedPointRules  []string
-	FixedPointCases  []string
-	Activities       []V2ActivityDescriptor
+	UnknownFields     []string
+	UnknownClasses    []string
+	Policies          []string
+	ToolchainDigest   string
+	ProofChoices      []string
+	IndicatorClasses  []string
+	FixedPointRules   []string
+	FixedPointCases   []string
+	Activities        []V2ActivityDescriptor
 }
 
 type V3SemanticIR struct {
@@ -115,16 +115,16 @@ type V3SemanticIR struct {
 }
 
 type V3VerificationIdentity struct {
-	TestIdentity         string `json:"test_identity"`
-	ConformanceIdentity  string `json:"conformance_identity"`
-	ScenarioIdentity     string `json:"scenario_identity"`
-	InputDigest          string `json:"input_digest"`
-	ToolchainDigest      string `json:"toolchain_digest"`
-	SemanticIRDigest     string `json:"semantic_ir_digest"`
-	SourceDigest         string `json:"source_digest"`
-	FixtureDigest        string `json:"fixture_digest"`
-	ContractDigest       string `json:"contract_digest"`
-	EvaluatorDigest      string `json:"evaluator_digest"`
+	TestIdentity        string `json:"test_identity"`
+	ConformanceIdentity string `json:"conformance_identity"`
+	ScenarioIdentity    string `json:"scenario_identity"`
+	InputDigest         string `json:"input_digest"`
+	ToolchainDigest     string `json:"toolchain_digest"`
+	SemanticIRDigest    string `json:"semantic_ir_digest"`
+	SourceDigest        string `json:"source_digest"`
+	FixtureDigest       string `json:"fixture_digest"`
+	ContractDigest      string `json:"contract_digest"`
+	EvaluatorDigest     string `json:"evaluator_digest"`
 }
 
 func (identity V3VerificationIdentity) Missing() []string {
@@ -173,14 +173,14 @@ func (identity V3PriorRunIdentity) Missing() []string {
 }
 
 type V3Observation struct {
-	Status      string `json:"status"`
-	BuildMS     *int64 `json:"build_ms"`
-	TestMS      *int64 `json:"test_ms"`
-	WallMS      *int64 `json:"wall_ms"`
-	PeakRSSKiB  *int64 `json:"peak_rss_kib"`
-	CacheHit    *bool  `json:"cache_hit"`
-	CacheMiss   *bool  `json:"cache_miss"`
-	DurationMS  *int64 `json:"duration_ms,omitempty"`
+	Status     string `json:"status"`
+	BuildMS    *int64 `json:"build_ms"`
+	TestMS     *int64 `json:"test_ms"`
+	WallMS     *int64 `json:"wall_ms"`
+	PeakRSSKiB *int64 `json:"peak_rss_kib"`
+	CacheHit   *bool  `json:"cache_hit"`
+	CacheMiss  *bool  `json:"cache_miss"`
+	DurationMS *int64 `json:"duration_ms,omitempty"`
 }
 
 type V3MetricVector struct {
@@ -191,16 +191,16 @@ type V3MetricVector struct {
 }
 
 type V3MetricPair struct {
-	ScenarioIdentity    string                  `json:"scenario_identity"`
-	Before              V3MetricVector         `json:"before"`
-	After               V3MetricVector         `json:"after"`
-	BeforeIdentity      V3VerificationIdentity `json:"before_identity"`
-	AfterIdentity       V3VerificationIdentity `json:"after_identity"`
-	BeforePriorRun      V3PriorRunIdentity     `json:"before_prior_run_identity"`
-	AfterPriorRun       V3PriorRunIdentity     `json:"after_prior_run_identity"`
-	BeforeKnown         bool                    `json:"before_known"`
-	AfterKnown          bool                    `json:"after_known"`
-	RunState            string                  `json:"run_state"`
+	ScenarioIdentity string                 `json:"scenario_identity"`
+	Before           V3MetricVector         `json:"before"`
+	After            V3MetricVector         `json:"after"`
+	BeforeIdentity   V3VerificationIdentity `json:"before_identity"`
+	AfterIdentity    V3VerificationIdentity `json:"after_identity"`
+	BeforePriorRun   V3PriorRunIdentity     `json:"before_prior_run_identity"`
+	AfterPriorRun    V3PriorRunIdentity     `json:"after_prior_run_identity"`
+	BeforeKnown      bool                   `json:"before_known"`
+	AfterKnown       bool                   `json:"after_known"`
+	RunState         string                 `json:"run_state"`
 }
 
 type V3GraphNode struct {
@@ -228,22 +228,22 @@ type V3ChangeSet struct {
 }
 
 type V3ActivityInput struct {
-	ActivityID       string                  `json:"activity_id"`
-	SemanticNodes    []string                `json:"semantic_nodes"`
-	CurrentIdentity  *V3VerificationIdentity `json:"current_identity,omitempty"`
-	PriorEvidence    *V3PriorEvidence        `json:"prior_evidence,omitempty"`
-	Observation      *V3Observation          `json:"observation,omitempty"`
+	ActivityID      string                  `json:"activity_id"`
+	SemanticNodes   []string                `json:"semantic_nodes"`
+	CurrentIdentity *V3VerificationIdentity `json:"current_identity,omitempty"`
+	PriorEvidence   *V3PriorEvidence        `json:"prior_evidence,omitempty"`
+	Observation     *V3Observation          `json:"observation,omitempty"`
 }
 
 type V3PriorEvidence struct {
-	State           string                  `json:"state"`
-	Immutable       bool                    `json:"immutable"`
-	Identity        V3VerificationIdentity  `json:"identity"`
-	PriorRun        V3PriorRunIdentity      `json:"prior_run_identity"`
-	ResultDigest    string                  `json:"result_digest"`
-	ReceiptDigest   string                  `json:"receipt_digest"`
-	ContentDigest   string                  `json:"content_digest"`
-	ProofSource     string                  `json:"proof_source"`
+	State         string                 `json:"state"`
+	Immutable     bool                   `json:"immutable"`
+	Identity      V3VerificationIdentity `json:"identity"`
+	PriorRun      V3PriorRunIdentity     `json:"prior_run_identity"`
+	ResultDigest  string                 `json:"result_digest"`
+	ReceiptDigest string                 `json:"receipt_digest"`
+	ContentDigest string                 `json:"content_digest"`
+	ProofSource   string                 `json:"proof_source"`
 }
 
 type V3FixedPointEvidence struct {
@@ -253,21 +253,21 @@ type V3FixedPointEvidence struct {
 }
 
 type V3Fixture struct {
-	Schema              string                 `json:"schema"`
-	CaseID              string                 `json:"case_id"`
-	Description         string                 `json:"description"`
-	Kind                string                 `json:"kind"`
-	FixtureAnchor       string                 `json:"fixture_anchor"`
-	FixedPoint          *V3FixedPointEvidence  `json:"fixed_point,omitempty"`
-	SemanticChange      V3ChangeSet            `json:"semantic_change"`
-	Before              V3ProofGraph           `json:"before"`
-	After               V3ProofGraph            `json:"after"`
-	IdentityDefaults    V3VerificationIdentity `json:"identity_defaults"`
-	PriorEvidenceDefaults *V3PriorEvidence     `json:"prior_evidence_defaults,omitempty"`
-	ObservationDefaults V3Observation          `json:"observation_defaults"`
-	Activities          []V3ActivityInput      `json:"activities"`
-	Indicators          V3MetricPair           `json:"indicators"`
-	Expected            V3Expected             `json:"expected"`
+	Schema                string                 `json:"schema"`
+	CaseID                string                 `json:"case_id"`
+	Description           string                 `json:"description"`
+	Kind                  string                 `json:"kind"`
+	FixtureAnchor         string                 `json:"fixture_anchor"`
+	FixedPoint            *V3FixedPointEvidence  `json:"fixed_point,omitempty"`
+	SemanticChange        V3ChangeSet            `json:"semantic_change"`
+	Before                V3ProofGraph           `json:"before"`
+	After                 V3ProofGraph           `json:"after"`
+	IdentityDefaults      V3VerificationIdentity `json:"identity_defaults"`
+	PriorEvidenceDefaults *V3PriorEvidence       `json:"prior_evidence_defaults,omitempty"`
+	ObservationDefaults   V3Observation          `json:"observation_defaults"`
+	Activities            []V3ActivityInput      `json:"activities"`
+	Indicators            V3MetricPair           `json:"indicators"`
+	Expected              V3Expected             `json:"expected"`
 }
 
 type V3Expected struct {
@@ -309,11 +309,11 @@ type V3Projection struct {
 }
 
 type V3ProjectedActivity struct {
-	Descriptor   V2ActivityDescriptor
-	Input        V3ActivityInput
-	Identity     V3VerificationIdentity
-	Prior        *V3PriorEvidence
-	Observation  V3Observation
+	Descriptor  V2ActivityDescriptor
+	Input       V3ActivityInput
+	Identity    V3VerificationIdentity
+	Prior       *V3PriorEvidence
+	Observation V3Observation
 }
 
 type V3UnknownRecord struct {
@@ -326,50 +326,50 @@ type V3UnknownRecord struct {
 }
 
 type V3ActivityPlan struct {
-	ActivityID         string                  `json:"activity_id"`
-	Activity           string                  `json:"activity"`
-	ProofChoice        string                  `json:"proof_choice"`
-	IndicatorClass     string                  `json:"indicator_class"`
-	Action             string                  `json:"action"`
-	ReusableEvidence   bool                    `json:"reusable_evidence"`
-	MustExecute        bool                    `json:"must_execute"`
-	AlreadyVerified    bool                    `json:"already_verified"`
-	RequiredRun        bool                    `json:"required_run"`
-	Executed           bool                    `json:"executed"`
-	SkippedWithProof   bool                    `json:"skipped_with_proof"`
-	Unknown            bool                    `json:"unknown"`
-	Refuted            bool                    `json:"refuted"`
-	ReuseClaimState    string                  `json:"reuse_claim_state"`
-	MeasurementState   string                  `json:"measurement_state"`
-	TestIdentity       string                  `json:"test_identity"`
-	ConformanceIdentity string                 `json:"conformance_identity"`
-	InputDigest        string                  `json:"input_digest"`
-	ToolchainDigest    string                  `json:"toolchain_digest"`
-	SemanticIRDigest   string                  `json:"semantic_ir_digest"`
-	PriorRunIdentity   *V3PriorRunIdentity    `json:"prior_run_identity,omitempty"`
-	BuildMS            *int64                 `json:"build_ms"`
-	TestMS             *int64                 `json:"test_ms"`
-	WallMS             *int64                 `json:"wall_ms"`
-	PeakRSSKiB         *int64                 `json:"peak_rss_kib"`
-	CacheHit           *bool                  `json:"cache_hit"`
-	CacheMiss          *bool                  `json:"cache_miss"`
-	MismatchedFields   []string               `json:"mismatched_fields,omitempty"`
-	UnknownRecord      *V3UnknownRecord       `json:"unknown_record,omitempty"`
-	Reason             string                  `json:"reason"`
-	NextOperation      string                  `json:"next_operation"`
+	ActivityID          string              `json:"activity_id"`
+	Activity            string              `json:"activity"`
+	ProofChoice         string              `json:"proof_choice"`
+	IndicatorClass      string              `json:"indicator_class"`
+	Action              string              `json:"action"`
+	ReusableEvidence    bool                `json:"reusable_evidence"`
+	MustExecute         bool                `json:"must_execute"`
+	AlreadyVerified     bool                `json:"already_verified"`
+	RequiredRun         bool                `json:"required_run"`
+	Executed            bool                `json:"executed"`
+	SkippedWithProof    bool                `json:"skipped_with_proof"`
+	Unknown             bool                `json:"unknown"`
+	Refuted             bool                `json:"refuted"`
+	ReuseClaimState     string              `json:"reuse_claim_state"`
+	MeasurementState    string              `json:"measurement_state"`
+	TestIdentity        string              `json:"test_identity"`
+	ConformanceIdentity string              `json:"conformance_identity"`
+	InputDigest         string              `json:"input_digest"`
+	ToolchainDigest     string              `json:"toolchain_digest"`
+	SemanticIRDigest    string              `json:"semantic_ir_digest"`
+	PriorRunIdentity    *V3PriorRunIdentity `json:"prior_run_identity,omitempty"`
+	BuildMS             *int64              `json:"build_ms"`
+	TestMS              *int64              `json:"test_ms"`
+	WallMS              *int64              `json:"wall_ms"`
+	PeakRSSKiB          *int64              `json:"peak_rss_kib"`
+	CacheHit            *bool               `json:"cache_hit"`
+	CacheMiss           *bool               `json:"cache_miss"`
+	MismatchedFields    []string            `json:"mismatched_fields,omitempty"`
+	UnknownRecord       *V3UnknownRecord    `json:"unknown_record,omitempty"`
+	Reason              string              `json:"reason"`
+	NextOperation       string              `json:"next_operation"`
 }
 
 type V3IndicatorObservation struct {
-	Metric       string            `json:"metric"`
-	Before       *int64            `json:"before"`
-	After        *int64            `json:"after"`
-	Delta        *int64            `json:"delta"`
-	SignedDelta  *int64            `json:"signed_delta"`
-	Improvement  *int64            `json:"improvement"`
-	State        string            `json:"state"`
-	SameIdentity bool              `json:"same_identity"`
+	Metric        string           `json:"metric"`
+	Before        *int64           `json:"before"`
+	After         *int64           `json:"after"`
+	Delta         *int64           `json:"delta"`
+	SignedDelta   *int64           `json:"signed_delta"`
+	Improvement   *int64           `json:"improvement"`
+	State         string           `json:"state"`
+	SameIdentity  bool             `json:"same_identity"`
 	UnknownRecord *V3UnknownRecord `json:"unknown_record,omitempty"`
-	Reason       string            `json:"reason"`
+	Reason        string           `json:"reason"`
 }
 
 type V3DossierSummary struct {
@@ -383,46 +383,46 @@ type V3DossierSummary struct {
 }
 
 type V3ActionsReceipt struct {
-	Schema                    string                 `json:"schema"`
-	RunIdentity               V3PriorRunIdentity    `json:"run_identity"`
-	TestIdentity              string                 `json:"test_identity"`
-	ConformanceIdentity       string                 `json:"conformance_identity"`
-	InputDigest               string                 `json:"input_digest"`
-	ToolchainDigest           string                 `json:"toolchain_digest"`
-	SemanticIRDigest          string                 `json:"semantic_ir_digest"`
-	BuildMS                   *int64                 `json:"build_ms"`
-	TestMS                    *int64                 `json:"test_ms"`
-	WallMS                    *int64                 `json:"wall_ms"`
-	PeakRSSKiB                *int64                 `json:"peak_rss_kib"`
-	CacheHit                  *bool                  `json:"cache_hit"`
-	CacheMiss                 *bool                  `json:"cache_miss"`
-	CacheHits                 *int64                 `json:"cache_hits"`
-	CacheMisses               *int64                 `json:"cache_misses"`
-	Activities                []V3Observation       `json:"activities"`
-	OperationalState          string                 `json:"operational_state"`
-	RepositoryWrites          int                    `json:"repository_writes"`
-	LocalTestExecutions       int                    `json:"local_test_executions"`
-	CrossProjectRequiredGates int                    `json:"cross_project_required_gates"`
+	Schema                    string             `json:"schema"`
+	RunIdentity               V3PriorRunIdentity `json:"run_identity"`
+	TestIdentity              string             `json:"test_identity"`
+	ConformanceIdentity       string             `json:"conformance_identity"`
+	InputDigest               string             `json:"input_digest"`
+	ToolchainDigest           string             `json:"toolchain_digest"`
+	SemanticIRDigest          string             `json:"semantic_ir_digest"`
+	BuildMS                   *int64             `json:"build_ms"`
+	TestMS                    *int64             `json:"test_ms"`
+	WallMS                    *int64             `json:"wall_ms"`
+	PeakRSSKiB                *int64             `json:"peak_rss_kib"`
+	CacheHit                  *bool              `json:"cache_hit"`
+	CacheMiss                 *bool              `json:"cache_miss"`
+	CacheHits                 *int64             `json:"cache_hits"`
+	CacheMisses               *int64             `json:"cache_misses"`
+	Activities                []V3Observation    `json:"activities"`
+	OperationalState          string             `json:"operational_state"`
+	RepositoryWrites          int                `json:"repository_writes"`
+	LocalTestExecutions       int                `json:"local_test_executions"`
+	CrossProjectRequiredGates int                `json:"cross_project_required_gates"`
 }
 
 type V3Report struct {
-	Schema          string                    `json:"schema"`
-	CaseID          string                    `json:"case_id"`
-	Decision        string                    `json:"decision"`
-	Precedence      []string                  `json:"precedence"`
-	SemanticIR      V3SemanticIR              `json:"semantic_ir"`
-	SemanticChange  V3ChangeSet               `json:"semantic_change"`
-	ImpactNodes     []string                  `json:"impacted_nodes"`
-	ImpactEdges     []string                  `json:"impact_edges"`
-	Activities      []V3ActivityPlan          `json:"activities"`
-	Summary         V3DossierSummary          `json:"dossier_summary"`
-	Indicators      []V3IndicatorObservation  `json:"indicators"`
-	Unknowns        []V3UnknownRecord          `json:"unknowns,omitempty"`
-	RefutedReasons  []string                  `json:"refuted_reasons,omitempty"`
-	ContractDigest  string                    `json:"contract_digest"`
-	FixtureDigest   string                    `json:"fixture_digest"`
-	EvaluatorDigest string                    `json:"evaluator_digest"`
-	ActionsReceipt  *V3ActionsReceipt         `json:"actions_receipt,omitempty"`
+	Schema          string                   `json:"schema"`
+	CaseID          string                   `json:"case_id"`
+	Decision        string                   `json:"decision"`
+	Precedence      []string                 `json:"precedence"`
+	SemanticIR      V3SemanticIR             `json:"semantic_ir"`
+	SemanticChange  V3ChangeSet              `json:"semantic_change"`
+	ImpactNodes     []string                 `json:"impacted_nodes"`
+	ImpactEdges     []string                 `json:"impact_edges"`
+	Activities      []V3ActivityPlan         `json:"activities"`
+	Summary         V3DossierSummary         `json:"dossier_summary"`
+	Indicators      []V3IndicatorObservation `json:"indicators"`
+	Unknowns        []V3UnknownRecord        `json:"unknowns,omitempty"`
+	RefutedReasons  []string                 `json:"refuted_reasons,omitempty"`
+	ContractDigest  string                   `json:"contract_digest"`
+	FixtureDigest   string                   `json:"fixture_digest"`
+	EvaluatorDigest string                   `json:"evaluator_digest"`
+	ActionsReceipt  *V3ActionsReceipt        `json:"actions_receipt,omitempty"`
 	FixedPointState string                    `json:"fixed_point_state"`
 	Operational     V3Operational              `json:"operational"`
 }
@@ -432,8 +432,8 @@ type V3Operational struct {
 	LocalTestExecutions       int    `json:"local_test_executions"`
 	CrossProjectRequiredGates int    `json:"cross_project_required_gates"`
 	FailedRunsPreserved       bool   `json:"failed_runs_preserved"`
-	OutputLocation             string `json:"output_location"`
-	VerificationAuthority      string `json:"verification_authority"`
+	OutputLocation        string `json:"output_location"`
+	VerificationAuthority string `json:"verification_authority"`
 }
 
 type V3CaseResult struct {
@@ -445,17 +445,17 @@ type V3CaseResult struct {
 }
 
 type V3SuiteReport struct {
-	Schema                  string             `json:"schema"`
-	Decision                string             `json:"decision"`
-	Contract                string             `json:"contract"`
-	ContractDigest          string             `json:"contract_digest"`
-	TotalActivities         int                `json:"total_activities"`
-	ProofTotals             map[string]int     `json:"proof_totals"`
-	IndicatorTotals         map[string]int     `json:"indicator_totals"`
-	Cases                   []V3CaseResult     `json:"cases"`
-	LegacyExactReuseClosed  bool               `json:"legacy_exact_reuse_closed"`
-	ActionsReceipt          *V3ActionsReceipt  `json:"actions_receipt,omitempty"`
-	ActionsMetricState      string             `json:"actions_metric_state"`
-	MissingActionsMetrics   []string           `json:"missing_actions_metrics,omitempty"`
-	Operational             V3Operational      `json:"operational"`
+	Schema                 string            `json:"schema"`
+	Decision               string            `json:"decision"`
+	Contract               string            `json:"contract"`
+	ContractDigest         string            `json:"contract_digest"`
+	TotalActivities        int               `json:"total_activities"`
+	ProofTotals            map[string]int    `json:"proof_totals"`
+	IndicatorTotals        map[string]int    `json:"indicator_totals"`
+	Cases                  []V3CaseResult    `json:"cases"`
+	LegacyExactReuseClosed bool              `json:"legacy_exact_reuse_closed"`
+	ActionsReceipt         *V3ActionsReceipt `json:"actions_receipt,omitempty"`
+	ActionsMetricState     string            `json:"actions_metric_state"`
+	MissingActionsMetrics  []string          `json:"missing_actions_metrics,omitempty"`
+	Operational            V3Operational     `json:"operational"`
 }
