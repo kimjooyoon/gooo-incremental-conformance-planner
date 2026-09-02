@@ -138,14 +138,27 @@ jobs:
             upload_url=$(printf '%s' "$release_json" | jq -r '.upload_url')
             test -n "$upload_url" && test "$upload_url" != "null"
             upload_url="${upload_url%%\{*}"
-            upload_json=$(curl --fail --silent --show-error --location \
+            upload_body="$RUNNER_TEMP/release-upload.json"
+            if upload_status=$(curl --silent --show-error --location \
               --request POST \
               --header "Authorization: Bearer $GH_TOKEN" \
               --header 'Accept: application/vnd.github+json' \
               --header 'Content-Type: application/octet-stream' \
               --header 'X-GitHub-Api-Version: 2026-03-10' \
               --data-binary "@$asset" \
-              "$upload_url?name=$asset_name")
+              --output "$upload_body" \
+              --write-out '%{http_code}' \
+              "$upload_url?name=$asset_name"); then
+              :
+            else
+              cat "$upload_body" || true
+              exit 1
+            fi
+            if [[ "$upload_status" != 201 ]]; then
+              cat "$upload_body"
+              exit 1
+            fi
+            upload_json=$(<"$upload_body")
             jq -e --arg name "$asset_name" '.name == $name and .state == "uploaded"' <<<"$upload_json" >/dev/null
           elif [[ "$asset_count" != 1 ]]; then
             echo "refusing to mutate release $RELEASE_TAG with $asset_count existing assets" >&2
