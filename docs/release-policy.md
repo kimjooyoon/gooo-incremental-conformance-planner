@@ -17,6 +17,12 @@ audit. Future releases use this draft-first policy:
    asset digest.
 5. It publishes only when the resulting release reports `immutable=true`.
 
+If a run stops after creating the tag or draft, a later run may recover that
+same draft only when the existing annotated tag still points to a commit in
+the current `main` history. The tag is never moved. Release verification
+records both the preserved tag target and the Actions run/head that produced
+the final evidence.
+
 The workflow records Actions run identity, commit digest, Go toolchain identity,
 exact measurement values, and artifact digests. A failed run remains retained
 as operational evidence. A tag, release, or asset is never overwritten,
