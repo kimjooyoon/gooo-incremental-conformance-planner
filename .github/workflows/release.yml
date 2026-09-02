@@ -1,0 +1,149 @@
+name: Main evidence and release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      EVIDENCE_DIR: ${{ runner.temp }}/gooo-incremental-conformance-planner-main
+      RELEASE_TAG: v0.1.0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go 1.27
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.27.x'
+          check-latest: true
+
+      - name: Check Go formatting
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          files=$(gofmt -l .)
+          if [[ -n "$files" ]]; then
+            printf '%s\n' "$files"
+            exit 1
+          fi
+
+      - name: Check workflow syntax
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          docker run --rm -v "$GITHUB_WORKSPACE:/repo" -w /repo rhysd/actionlint:1.7.7
+
+      - name: Check shell syntax
+        shell: bash
+        run: bash -n scripts/*.sh
+
+      - name: Measure build and test
+        shell: bash
+        run: bash scripts/ci-measure.sh "$EVIDENCE_DIR/measure"
+
+      - name: Vet
+        shell: bash
+        run: go vet ./...
+
+      - name: Run fixed conformance
+        shell: bash
+        run: bash scripts/conformance.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner" "$EVIDENCE_DIR/conformance"
+
+      - name: Record inventory
+        shell: bash
+        run: bash scripts/inventory.sh "$EVIDENCE_DIR"
+
+      - name: Assert evidence
+        shell: bash
+        run: bash scripts/assert-evidence.sh "$EVIDENCE_DIR"
+
+      - name: Assemble evidence
+        shell: bash
+        run: bash scripts/assemble-evidence.sh "$EVIDENCE_DIR"
+
+      - name: Build immutable evidence asset
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          asset="$RUNNER_TEMP/gooo-incremental-conformance-planner-${RELEASE_TAG}-evidence.tar.gz"
+          tar -czf "$asset" -C "$EVIDENCE_DIR" .
+          digest=$(sha256sum "$asset" | awk '{print $1}')
+          printf 'asset=%s\ndigest=sha256:%s\n' "$asset" "$digest" > "$RUNNER_TEMP/release-asset.txt"
+
+      - name: Create annotated tag and draft release once
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          if git ls-remote --exit-code --refs origin "refs/tags/$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "refusing to overwrite existing tag $RELEASE_TAG" >&2
+            exit 1
+          fi
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            echo "refusing to overwrite existing release $RELEASE_TAG" >&2
+            exit 1
+          fi
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git tag -a "$RELEASE_TAG" "$GITHUB_SHA" -m "gooo incremental conformance planner $RELEASE_TAG"
+          git push origin "$RELEASE_TAG"
+          tag_target=$(git rev-parse "$RELEASE_TAG^{}")
+          test "$tag_target" = "$GITHUB_SHA"
+          asset=$(awk -F= '$1 == "asset" {print $2}' "$RUNNER_TEMP/release-asset.txt")
+          digest=$(awk -F= '$1 == "digest" {print $2}' "$RUNNER_TEMP/release-asset.txt")
+          printf '# %s\n\nEvidence asset digest: `%s`\n\nThe release is published only after draft verification.\n' "$RELEASE_TAG" "$digest" > "$RUNNER_TEMP/release-notes.md"
+          gh release create "$RELEASE_TAG" "$asset" --draft --title "Gooo incremental conformance planner $RELEASE_TAG" --notes-file "$RUNNER_TEMP/release-notes.md" --verify-tag
+
+      - name: Verify draft tag and asset digest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          release_json="$RUNNER_TEMP/release.json"
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" > "$release_json"
+          jq -e --arg tag "$RELEASE_TAG" --arg sha "$GITHUB_SHA" '
+            .tag_name == $tag and .draft == true and (.assets | length == 1)
+          ' "$release_json" >/dev/null
+          tag_ref=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$RELEASE_TAG")
+          tag_object=$(printf '%s' "$tag_ref" | jq -r '.object.sha')
+          tag_json=$(gh api "repos/$GITHUB_REPOSITORY/git/tags/$tag_object")
+          jq -e --arg sha "$GITHUB_SHA" '.object.sha == $sha and .object.type == "commit"' <<<"$tag_json" >/dev/null
+          asset_id=$(jq -r '.assets[0].id' "$release_json")
+          asset=$(awk -F= '$1 == "asset" {print $2}' "$RUNNER_TEMP/release-asset.txt")
+          expected=$(awk -F= '$1 == "digest" {print $2}' "$RUNNER_TEMP/release-asset.txt")
+          server_digest=$(jq -r '.assets[0].digest // empty' "$release_json")
+          if [[ -n "$server_digest" ]]; then
+            test "$server_digest" = "$expected"
+          fi
+          gh api --header 'Accept: application/octet-stream' "repos/$GITHUB_REPOSITORY/releases/assets/$asset_id" > "$RUNNER_TEMP/downloaded-evidence.tar.gz"
+          downloaded="sha256:$(sha256sum "$RUNNER_TEMP/downloaded-evidence.tar.gz" | awk '{print $1}')"
+          test "$downloaded" = "$expected"
+          jq -n --arg tag "$RELEASE_TAG" --arg commit "$GITHUB_SHA" --arg asset "$asset" --arg expected "$expected" --arg downloaded "$downloaded" --argjson asset_id "$asset_id" '{tag:$tag, commit_sha:$commit, asset:$asset, asset_id:$asset_id, expected_digest:$expected, downloaded_digest:$downloaded, draft_verified:true}' > "$EVIDENCE_DIR/release-verification.json"
+
+      - name: Publish verified draft without rewriting it
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -Eeuo pipefail
+          gh release edit "$RELEASE_TAG" --draft=false
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" | jq -e '.draft == false' >/dev/null
+
+      - name: Upload main evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gooo-incremental-conformance-planner-main-${{ github.run_id }}
+          path: ${{ env.EVIDENCE_DIR }}
+          if-no-files-found: warn
+          retention-days: 90

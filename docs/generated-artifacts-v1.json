@@ -1,0 +1,17 @@
+{
+  "schema": "gooo/incremental-conformance-planner/generated-artifacts/v1",
+  "root_readme_excluded": true,
+  "caller_owned_output": true,
+  "artifacts": [
+    {"path": "report.json", "kind": "machine-report"},
+    {"path": "unit-vector.json", "kind": "per-unit-plan-vector"},
+    {"path": "indicator-vector.json", "kind": "per-indicator-vector"},
+    {"path": "human-report.md", "kind": "human-report"},
+    {"path": "suite-report.json", "kind": "conformance-suite-report"},
+    {"path": "inventory.json", "kind": "repository-inventory"},
+    {"path": "ci-measurements.json", "kind": "actions-measurement"},
+    {"path": "evidence-manifest.json", "kind": "release-evidence-manifest"}
+  ],
+  "digest": "sha256:computed-in-actions",
+  "no_repository_write": true
+}

@@ -1,0 +1,24 @@
+{
+  "schema": "gooo/incremental-conformance-planner/denominator/v1",
+  "id": "incremental-conformance-planner-v1",
+  "version": "v1",
+  "fixed": true,
+  "cells": 12,
+  "precedence": ["REFUTED", "UNKNOWN", "CLOSED"],
+  "proof_denominator": {"CLOSED": 4, "UNKNOWN": 4, "REFUTED": 4},
+  "indicator_denominator": {"OBSERVED": 4, "UNKNOWN": 4, "REFUTED": 4},
+  "cases": [
+    {"id": "exact-cache-hit", "source": "fixtures/cases/exact-cache-hit.json", "expected": "CLOSED", "kind": "proof"},
+    {"id": "semantic-impact-propagation", "source": "fixtures/cases/semantic-impact-propagation.json", "expected": "CLOSED", "kind": "proof"},
+    {"id": "unrelated-change", "source": "fixtures/cases/unrelated-change.json", "expected": "CLOSED", "kind": "proof"},
+    {"id": "exact-cache-hit-with-optional-slicer", "source": "fixtures/cases/exact-cache-hit-with-optional-slicer.json", "expected": "CLOSED", "kind": "proof"},
+    {"id": "stale-toolchain", "source": "fixtures/cases/stale-toolchain.json", "expected": "CLOSED", "kind": "proof"},
+    {"id": "missing-fixture-digest", "source": "fixtures/cases/missing-fixture-digest.json", "expected": "UNKNOWN", "kind": "proof"},
+    {"id": "missing-cache-receipt", "source": "fixtures/cases/missing-cache-receipt.json", "expected": "UNKNOWN", "kind": "proof"},
+    {"id": "unmatched-before-after", "source": "fixtures/cases/unmatched-before-after.json", "expected": "UNKNOWN", "kind": "proof"},
+    {"id": "known-failed-test", "source": "fixtures/cases/known-failed-test.json", "expected": "REFUTED", "kind": "proof"},
+    {"id": "known-counterexample", "source": "fixtures/cases/known-counterexample.json", "expected": "REFUTED", "kind": "proof"},
+    {"id": "graph-edge-contradiction", "source": "fixtures/cases/graph-edge-contradiction.json", "expected": "REFUTED", "kind": "proof"},
+    {"id": "non-immutable-failed-receipt", "source": "fixtures/cases/non-immutable-failed-receipt.json", "expected": "REFUTED", "kind": "proof"}
+  ]
+}
