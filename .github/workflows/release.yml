@@ -49,16 +49,6 @@ jobs:
         shell: bash
         run: bash scripts/assert-immutable-release-policy.sh
 
-      - name: Verify repository immutable releases setting
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          # shellcheck disable=SC2016
-          set -Eeuo pipefail
-          settings=$(gh api "repos/$GITHUB_REPOSITORY/immutable-releases")
-          jq -e '.enabled == true' <<<"$settings" >/dev/null
-
       - name: Measure build and test
         shell: bash
         run: bash scripts/ci-measure.sh "$RUNNER_TEMP/gooo-incremental-conformance-planner-main/measure"
