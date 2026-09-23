@@ -22,7 +22,7 @@ func TestParseV3SourceRejectsDuplicateFixedPointCases(t *testing.T) {
 }
 
 func TestParseV3SourceRejectsImplicitFixedPointMode(t *testing.T) {
-	data, err := os.ReadFile(repoPath(".gooo", "incremental-conformance-planner-v3.gooo"))
+	data, err := os.ReadFile(filepath.Join("..", "..", ".gooo", "incremental-conformance-planner-v3.gooo"))
 	if err != nil {
 		t.Fatal(err)
 	}
