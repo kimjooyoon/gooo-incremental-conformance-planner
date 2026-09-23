@@ -12,7 +12,7 @@ import (
 
 func main() {
 	if len(os.Args) < 2 {
-		fatal("usage: gooo-incremental-conformance-planner <plan|conformance|conformance-v2|conformance-v3> [flags]")
+		fatal("usage: gooo-incremental-conformance-planner <plan|conformance|conformance-v2|conformance-v3|semantic-ir-v3-digest> [flags]")
 	}
 	switch os.Args[1] {
 	case "plan":
@@ -23,8 +23,10 @@ func main() {
 		conformanceV2(os.Args[2:])
 	case "conformance-v3":
 		conformanceV3(os.Args[2:])
+	case "semantic-ir-v3-digest":
+		semanticIRV3Digest(os.Args[2:])
 	default:
-		fatal("command must be plan, conformance, conformance-v2, or conformance-v3")
+		fatal("command must be plan, conformance, conformance-v2, conformance-v3, or semantic-ir-v3-digest")
 	}
 }
 
@@ -133,6 +135,26 @@ func conformanceV3(args []string) {
 	if report.Decision != planner.V3DecisionClosed {
 		os.Exit(1)
 	}
+}
+
+func semanticIRV3Digest(args []string) {
+	flags := flag.NewFlagSet("semantic-ir-v3-digest", flag.ContinueOnError)
+	flags.SetOutput(os.Stderr)
+	meta := flags.String("meta", ".gooo/incremental-conformance-planner-v3.gooo", "authoritative v3 .gooo source")
+	if err := flags.Parse(args); err != nil {
+		os.Exit(2)
+	}
+	source, sourceDigest, err := planner.ParseV3Source(*meta)
+	if err != nil {
+		fatal(err.Error())
+	}
+	ir, err := planner.BuildV3SemanticIR(source, *meta, sourceDigest)
+	if err != nil {
+		fatal(err.Error())
+	}
+	printJSON(struct {
+		SemanticIRDigest string `json:"semantic_ir_digest"`
+	}{ir.Digest})
 }
 
 func printJSON(value any) {

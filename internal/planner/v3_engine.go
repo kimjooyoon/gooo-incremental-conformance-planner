@@ -144,7 +144,7 @@ func missingV3ActionsEvidence(receipt V3ActionsReceipt) []string {
 	if receipt.SemanticIRDigest == "" {
 		missing = append(missing, "semantic_ir_digest")
 	}
-	return missing
+	return uniqueStrings(missing)
 }
 
 type V3EvaluatorArtifact struct {

@@ -67,6 +67,14 @@ if (( exit_code != 0 )); then
   operational_state=OPERATIONAL_REFUTED
 fi
 cache_hit=${GOOO_ACTION_CACHE_HIT:-}
+semantic_ir_digest=""
+if (( build_status == 0 )); then
+  semantic_ir_digest=$(
+    "$RUNNER_TEMP/gooo-incremental-conformance-planner" semantic-ir-v3-digest \
+      --meta .gooo/incremental-conformance-planner-v3.gooo \
+      | jq -r '.semantic_ir_digest'
+  )
+fi
 jq -n \
   --arg run_id "${GITHUB_RUN_ID:-}" \
   --arg cache_hit "$cache_hit" \
@@ -110,7 +118,7 @@ jq -n \
   --arg conformance_identity "sha256:$conformance_identity" \
   --arg input_digest "sha256:$input_digest" \
   --arg toolchain_digest "sha256:go1.27.0" \
-  --arg semantic_ir_digest "" \
+  --arg semantic_ir_digest "$semantic_ir_digest" \
   --arg cache_hit "$cache_hit" \
   --argjson build_ms "$build_ms" \
   --argjson test_ms "$test_ms" \
