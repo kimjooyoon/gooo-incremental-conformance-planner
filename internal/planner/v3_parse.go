@@ -70,6 +70,9 @@ func ParseV3Source(path string) (V3Source, string, error) {
 			if len(fields) < 3 {
 				return V3Source{}, "", fmt.Errorf("line %d: fixed_point_case requires id and mode", lineNumber)
 			}
+			if fields[2] != V3FixedPointExplicit {
+				return V3Source{}, "", fmt.Errorf("line %d: fixed_point_case %q must use %s", lineNumber, fields[1], V3FixedPointExplicit)
+			}
 			if seenFixedPointCases[fields[1]] {
 				return V3Source{}, "", fmt.Errorf("line %d: duplicate fixed_point_case %q", lineNumber, fields[1])
 			}
