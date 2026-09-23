@@ -1,7 +1,9 @@
 package planner
 
 import (
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -41,6 +43,35 @@ func TestMetaOwnsUnknownClassesAndFixedPointCases(t *testing.T) {
 	}
 	if len(meta.UnknownClasses) != 4 || len(meta.FixedPointRules) != 3 || len(meta.FixedPointCases) != 3 {
 		t.Fatalf("meta unknown/fixed-point declarations = %v/%v/%v", meta.UnknownClasses, meta.FixedPointRules, meta.FixedPointCases)
+	}
+}
+
+func TestOptionalInputRejectsUnknownAndMalformedFields(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("..", "..", ".gooo", "incremental-conformance-planner.gooo"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, test := range []struct {
+		name   string
+		field  string
+		wantIn string
+	}{
+		{name: "unknown field", field: "digest_pinnd=true", wantIn: "optional_input gooo-semantic-impact-slicer"},
+		{name: "bare field", field: "required", wantIn: "optional_input gooo-semantic-impact-slicer"},
+		{name: "invalid boolean", field: "required=maybe", wantIn: "optional_input gooo-semantic-impact-slicer"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			line := test.wantIn + " release=v0.1.1 digest_pinned=true required=false cross_project_gate=false copied=false " + test.field + "\n"
+			mutated := strings.Replace(string(data), "optional_input gooo-semantic-impact-slicer release=v0.1.1 digest_pinned=true required=false cross_project_gate=false copied=false\n", line, 1)
+			path := filepath.Join(t.TempDir(), "invalid.gooo")
+			if err := os.WriteFile(path, []byte(mutated), 0o600); err != nil {
+				t.Fatal(err)
+			}
+			if _, err := ParseMeta(path); err == nil {
+				t.Fatalf("ParseMeta accepted %s", test.field)
+			}
+		})
 	}
 }
 

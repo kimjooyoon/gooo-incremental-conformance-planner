@@ -76,7 +76,11 @@ func ParseMeta(path string) (Meta, error) {
 			}
 			meta.IndicatorCells = append(meta.IndicatorCells, Cell{State: fields[1], ID: fields[2]})
 		case "optional_input":
-			meta.OptionalInput = parseOptionalInput(fields[1:])
+			input, err := parseOptionalInput(fields[1:])
+			if err != nil {
+				return Meta{}, fmt.Errorf("line %d: %w", lineNumber, err)
+			}
+			meta.OptionalInput = input
 		case "forbidden_effect":
 			meta.ForbiddenEffects = append(meta.ForbiddenEffects, fields[1])
 		default:
@@ -92,27 +96,52 @@ func ParseMeta(path string) (Meta, error) {
 	return meta, nil
 }
 
-func parseOptionalInput(fields []string) OptionalInput {
+func parseOptionalInput(fields []string) (OptionalInput, error) {
 	input := OptionalInput{Name: fields[0]}
 	for _, field := range fields[1:] {
 		key, value, ok := strings.Cut(field, "=")
 		if !ok {
-			continue
+			return OptionalInput{}, fmt.Errorf("optional_input field %q must use key=value syntax", field)
 		}
 		switch key {
 		case "release":
 			input.Release = value
 		case "digest_pinned":
-			input.DigestPinned = value == "true"
+			parsed, err := parseOptionalBool(key, value)
+			if err != nil {
+				return OptionalInput{}, err
+			}
+			input.DigestPinned = parsed
 		case "required":
-			input.Required = value == "true"
+			parsed, err := parseOptionalBool(key, value)
+			if err != nil {
+				return OptionalInput{}, err
+			}
+			input.Required = parsed
 		case "cross_project_gate":
-			input.CrossProjectGate = value == "true"
+			parsed, err := parseOptionalBool(key, value)
+			if err != nil {
+				return OptionalInput{}, err
+			}
+			input.CrossProjectGate = parsed
 		case "copied":
-			input.Copied = value == "true"
+			parsed, err := parseOptionalBool(key, value)
+			if err != nil {
+				return OptionalInput{}, err
+			}
+			input.Copied = parsed
+		default:
+			return OptionalInput{}, fmt.Errorf("unknown optional_input field %q", key)
 		}
 	}
-	return input
+	return input, nil
+}
+
+func parseOptionalBool(key, value string) (bool, error) {
+	if value != "true" && value != "false" {
+		return false, fmt.Errorf("optional_input field %q must be true or false, got %q", key, value)
+	}
+	return value == "true", nil
 }
 
 func validateMeta(meta Meta) error {
