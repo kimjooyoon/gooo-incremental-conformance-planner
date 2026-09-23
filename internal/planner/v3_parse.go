@@ -67,7 +67,7 @@ func ParseV3Source(path string) (V3Source, string, error) {
 		case "fixed_point_rule":
 			source.FixedPointRules = append(source.FixedPointRules, fields[1])
 		case "fixed_point_case":
-			if len(fields) < 3 {
+			if len(fields) != 3 {
 				return V3Source{}, "", fmt.Errorf("line %d: fixed_point_case requires id and mode", lineNumber)
 			}
 			if seenFixedPointCases[fields[1]] {

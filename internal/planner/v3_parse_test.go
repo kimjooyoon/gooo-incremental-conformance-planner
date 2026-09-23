@@ -20,3 +20,18 @@ func TestParseV3SourceRejectsDuplicateFixedPointCases(t *testing.T) {
 		t.Fatal("ParseV3Source accepted duplicate fixed-point case IDs")
 	}
 }
+
+func TestParseV3SourceRejectsExtraFixedPointCaseFields(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join("..", "..", ".gooo", "incremental-conformance-planner-v3.gooo"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	data = append(data, []byte("\nfixed_point_case extra-test EXPLICIT_FIXED_POINT trailing\n")...)
+	path := filepath.Join(t.TempDir(), "planner-v3.gooo")
+	if err := os.WriteFile(path, data, 0o644); err != nil {
+		t.Fatal(err)
+	}
+	if _, _, err := ParseV3Source(path); err == nil {
+		t.Fatal("ParseV3Source accepted extra fixed-point case fields")
+	}
+}
