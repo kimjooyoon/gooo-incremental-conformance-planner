@@ -257,6 +257,9 @@ func validateV3Contract(contract V3Contract) error {
 	if len(contract.Scenarios) < 3 {
 		return errors.New("v3 contract must include normal, UNKNOWN, and REFUTED scenarios")
 	}
+	if err := validateV3ScenarioIdentities(contract.Scenarios); err != nil {
+		return err
+	}
 	seenExpected := map[string]bool{}
 	for _, scenario := range contract.Scenarios {
 		if scenario.ID == "" || scenario.Source == "" || (scenario.Expected != V3DecisionClosed && scenario.Expected != V3DecisionUnknown && scenario.Expected != V3DecisionRefuted) {
@@ -268,6 +271,25 @@ func validateV3Contract(contract V3Contract) error {
 		if !seenExpected[expected] {
 			return fmt.Errorf("v3 contract is missing a %s scenario", expected)
 		}
+	}
+	return nil
+}
+
+func validateV3ScenarioIdentities(scenarios []V3CaseSpec) error {
+	seenIDs := map[string]bool{}
+	seenSources := map[string]bool{}
+	for _, scenario := range scenarios {
+		if scenario.ID == "" || scenario.Source == "" {
+			return errors.New("v3 contract has an invalid scenario identity")
+		}
+		if seenIDs[scenario.ID] {
+			return fmt.Errorf("v3 contract has a duplicate scenario id %q", scenario.ID)
+		}
+		if seenSources[scenario.Source] {
+			return fmt.Errorf("v3 contract has a duplicate scenario source %q", scenario.Source)
+		}
+		seenIDs[scenario.ID] = true
+		seenSources[scenario.Source] = true
 	}
 	return nil
 }

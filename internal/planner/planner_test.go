@@ -80,6 +80,24 @@ func TestImplicitFixedPointCounterexampleIsRefuted(t *testing.T) {
 	}
 }
 
+func TestV3ContractRejectsDuplicateScenarioIdentity(t *testing.T) {
+	duplicateID := []V3CaseSpec{
+		{ID: "same", Source: "one.json", Expected: V3DecisionClosed},
+		{ID: "same", Source: "two.json", Expected: V3DecisionUnknown},
+	}
+	if err := validateV3ScenarioIdentities(duplicateID); err == nil {
+		t.Fatal("duplicate scenario id was accepted")
+	}
+
+	duplicateSource := []V3CaseSpec{
+		{ID: "one", Source: "same.json", Expected: V3DecisionClosed},
+		{ID: "two", Source: "same.json", Expected: V3DecisionUnknown},
+	}
+	if err := validateV3ScenarioIdentities(duplicateSource); err == nil {
+		t.Fatal("duplicate scenario source was accepted")
+	}
+}
+
 func completeIdentity(version string) CacheIdentity {
 	return CacheIdentity{
 		SourceDigest: "source:" + version, SemanticIRDigest: "ir:" + version,
