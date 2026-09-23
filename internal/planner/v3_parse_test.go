@@ -20,3 +20,13 @@ func TestParseV3SourceRejectsDuplicateFixedPointCases(t *testing.T) {
 		t.Fatal("ParseV3Source accepted duplicate fixed-point case IDs")
 	}
 }
+
+func TestMissingActionsSemanticIRIsUnknownEvidence(t *testing.T) {
+	missing := missingV3ActionsEvidence(V3ActionsReceipt{})
+	for _, field := range missing {
+		if field == "semantic_ir_digest" {
+			return
+		}
+	}
+	t.Fatalf("missing semantic IR provenance was not reported: %v", missing)
+}

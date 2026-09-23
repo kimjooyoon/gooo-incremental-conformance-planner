@@ -41,9 +41,6 @@ func RunV3Suite(options V3SuiteOptions) (V3SuiteReport, error) {
 		if err != nil {
 			return V3SuiteReport{}, err
 		}
-		if receipt.SemanticIRDigest == "" {
-			receipt.SemanticIRDigest = ir.Digest
-		}
 		actions = &receipt
 	}
 	if err := os.MkdirAll(options.OutputDir, 0o755); err != nil {
@@ -119,7 +116,7 @@ func RunV3Suite(options V3SuiteOptions) (V3SuiteReport, error) {
 	actionsMetricState := "OBSERVED"
 	missingActionsMetrics := []string{}
 	if actions != nil {
-		missingActionsMetrics = missingV3ActionsMetrics(*actions)
+		missingActionsMetrics = missingV3ActionsEvidence(*actions)
 		if len(missingActionsMetrics) > 0 && decision != V3DecisionRefuted {
 			actionsMetricState = V3DecisionUnknown
 			decision = V3DecisionUnknown
@@ -140,6 +137,14 @@ func RunV3Suite(options V3SuiteOptions) (V3SuiteReport, error) {
 		return V3SuiteReport{}, err
 	}
 	return suite, nil
+}
+
+func missingV3ActionsEvidence(receipt V3ActionsReceipt) []string {
+	missing := missingV3ActionsMetrics(receipt)
+	if receipt.SemanticIRDigest == "" {
+		missing = append(missing, "semantic_ir_digest")
+	}
+	return missing
 }
 
 type V3EvaluatorArtifact struct {
