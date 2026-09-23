@@ -1,10 +1,12 @@
 package planner
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -29,8 +31,17 @@ func readJSON(path string, value any) error {
 	if err != nil {
 		return err
 	}
-	if err := json.Unmarshal(data, value); err != nil {
+	decoder := json.NewDecoder(bytes.NewReader(data))
+	decoder.DisallowUnknownFields()
+	if err := decoder.Decode(value); err != nil {
 		return fmt.Errorf("decode %s: %w", path, err)
+	}
+	var trailing any
+	if err := decoder.Decode(&trailing); err != io.EOF {
+		if err == nil {
+			return fmt.Errorf("decode %s: trailing JSON value", path)
+		}
+		return fmt.Errorf("decode %s: trailing JSON data: %w", path, err)
 	}
 	return nil
 }
