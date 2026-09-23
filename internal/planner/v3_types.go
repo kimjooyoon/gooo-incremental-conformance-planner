@@ -281,6 +281,7 @@ type V3Contract struct {
 	ID                string                 `json:"id"`
 	Version           string                 `json:"version"`
 	AppendOnlyFrom    string                 `json:"append_only_from"`
+	BaseContract      string                 `json:"base_contract"`
 	TargetActivities  int                    `json:"target_activities"`
 	Precedence        []string               `json:"precedence"`
 	IdentityFields    []string               `json:"identity_fields"`
